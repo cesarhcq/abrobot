@@ -44,7 +44,11 @@ function initVelocityPublisher() {
 function initTeleopKeyboard() {
     // Use w, s, a, d keys to drive your robot
 
+<<<<<<< HEAD
     // Check if keyboard controller was aready created
+=======
+    // Check if keyboard controller was already created
+>>>>>>> raspi-kinetic
     if (teleop == null) {
         // Initialize the teleop.
         teleop = new KEYBOARDTELEOP.Teleop({

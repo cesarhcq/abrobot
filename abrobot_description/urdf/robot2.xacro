@@ -21,7 +21,7 @@
         <geometry>
           <cylinder length="0.0095" radius="0.2245"/>
         </geometry>
-        <material name ="veryDarkGrey" />
+        <material name ="White" />
       </visual>
 
       <collision>

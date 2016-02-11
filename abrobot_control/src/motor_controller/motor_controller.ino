@@ -24,7 +24,7 @@
 #define MOTOR_RIGHT 1         // motor pin Right
 
 #define PWM_1 9         // motor pin Right
-#define PWM_2 11         // motor pin Right
+#define PWM_2 10         // motor pin Right
 
 #include "robot_specs.h"
 #include <ArduinoHardware.h>
@@ -32,7 +32,7 @@
 #include <ros/time.h>
 #include <math.h>
 #include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/Point32.h>
 #include <SabertoothSimplified.h>
 
@@ -85,7 +85,7 @@ ros::NodeHandle  nh;
 //Subscribers
 ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &handle_cmd);
 //Publisher
-geometry_msgs::Vector3 vel_encoder_msg;
+geometry_msgs::Vector3Stamped vel_encoder_msg;
 ros::Publisher pub_encoder("/vel_encoder", &vel_encoder_msg);
 
 // *********************************************
@@ -263,21 +263,12 @@ int updatePid(int idMotor, double referenceValue, double encoderValue) {
 }
 
 void publishVEL(unsigned long time) {
-<<<<<<< HEAD
   vel_encoder_msg.header.stamp = nh.now();
   vel_encoder_msg.header.frame_id = encoder;
   vel_encoder_msg.vector.x = vel_act1;  // encoder left
   vel_encoder_msg.vector.y = vel_act2;  // pid rad/s
-  //vel_encoder_msg.vector.z = vel_req1;  // reference wr
-  vel_encoder_msg.vector.z = double(time)/1000;
-=======
-  //vel_encoder_msg.header.stamp = nh.now();
-  //vel_encoder_msg.header.frame_id = encoder;
-  vel_encoder_msg.x = vel_act1;  // encoder left
-  vel_encoder_msg.y = vel_act2;  // pid rad/s
-  //vel_encoder_msg.vector.z = vel_req1;  // reference wr
-  vel_encoder_msg.z = double(time)/1000;
->>>>>>> raspi-kinetic
+  vel_encoder_msg.vector.z = vel_req1;  // reference wr
+  //vel_encoder_msg.vector.z = double(time)/1000;
   pub_encoder.publish(&vel_encoder_msg);
   nh.spinOnce();
 }

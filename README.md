@@ -166,7 +166,7 @@ There're two ways to run rplidar ros package
 2. Saving the Map
 
 ```
-rosrun map_server map_saver -f ~/ABRobot/src/abrobot/abrobot_navigation/maps/test_map
+rosrun map_server map_saver -f ~/guntherbot/src/abrobot/abrobot_navigation/maps/test_map
 ```
 
 3. Loading the map
@@ -199,6 +199,7 @@ rosrun base_controller base_controller
 
 ```
 cd ~/ABRobot 
+<<<<<<< HEAD
 ```
 
 ```
@@ -206,6 +207,15 @@ source devel/setup.bash
 ```
 
 ```
+=======
+```
+
+```
+source devel/setup.bash
+```
+
+```
+>>>>>>> raspi-kinetic
 roslaunch base_controller gmapping.launch
 ```
 
@@ -248,3 +258,7 @@ Now, you can execute the launch file with roscore information
 
 ```rosrun rviz rviz```
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> raspi-kinetic

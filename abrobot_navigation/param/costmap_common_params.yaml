@@ -33,3 +33,4 @@ inflation_radius: 1.75 # 0.55 max. distance from an obstacle at which costs are 
 
 #static_layer:
 #  enabled: true
+

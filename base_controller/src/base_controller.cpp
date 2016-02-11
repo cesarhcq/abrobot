@@ -5,8 +5,10 @@
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/Vector3.h>
+#include <sensor_msgs/Imu.h>
+
+#define PI 3.14159265359
 
 double L = 0.4; // distance between axes
 double R = 0.0775; // wheel radius 
@@ -24,22 +26,24 @@ double dth_encoder = 0;
 ros::Time encoder_time;
 bool init = false;
 
-void handle_vel_encoder(const geometry_msgs::Vector3Stamped& encoder) {
-  encoder_time = encoder.header.stamp;
-  encoder_left = encoder.vector.x;
-  encoder_right = encoder.vector.y;
-  encoder_dt = encoder.vector.z;
+void handle_vel_encoder(const geometry_msgs::Vector3& encoder) {
+  //encoder_time = encoder.header.stamp;
+  encoder_left = encoder.x;
+  encoder_right = encoder.y;
+  encoder_dt = encoder.z;
 
   //ROS_INFO("encoder_left %lf - encoder_right %lf", encoder.vector.x, encoder.vector.y);
 }
 
 // Gyro Function from Smartphone
-void handle_gyro( const geometry_msgs::Vector3& gyro) {
-  gyro_x = gyro.x;
-  gyro_y = gyro.y;
-  gyro_z = gyro.z;
+void handle_gyro( const sensor_msgs::Imu::ConstPtr& msg) {
+  gyro_x = msg->angular_velocity.x;
+  gyro_y = msg->angular_velocity.y;
+  gyro_z = msg->angular_velocity.z;
+  //gyro_z = (msg->angular_velocity.z*PI)/180; // rad/s
 
-  //ROS_INFO("gyro_z: %lf ", gyro_z);
+  ROS_INFO("gyro_z: %lf ", gyro_z);
+  //ROS_INFO("Imu angular_velocity x: [%f], y: [%f], z: [%f]", msg->angular_velocity.x,msg->angular_velocity.y,msg->angular_velocity.z);
 }
 
 // Robot Differential Drive Reverse Kinematic
@@ -55,8 +59,10 @@ int main(int argc, char** argv){
 
   ros::NodeHandle nh;
   ros::NodeHandle nh_private_("~");
-  ros::Subscriber gyro_sub = nh.subscribe("gyro", 50, handle_gyro);
+  //ros::Subscriber gyro_sub = nh.subscribe("gyro", 50, handle_gyro);
   ros::Subscriber sub = nh.subscribe("/vel_encoder", 100, handle_vel_encoder);
+  ros::Subscriber gyro_sub = nh.subscribe("/imu/data", 50, handle_gyro);
+
   ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
 
   // Crete tf - base link and Odometry
@@ -92,13 +98,13 @@ int main(int argc, char** argv){
     if(!init){
 
       reverse_kinematics();
-      last_time = encoder_time;
+      last_time = ros::Time::now();
       init = true;
 
     }else if(init){
 
       reverse_kinematics(); // return v_encoder and dth_encoder
-      current_time = encoder_time;
+      current_time = ros::Time::now();
       //compute odometry in a typical way given the velocities of the robot
       double dt = (current_time - last_time).toSec();
       //double dt = encoder_dt;
