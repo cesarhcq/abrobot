@@ -92,3 +92,5 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
     <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
 
 </launch>
+
+

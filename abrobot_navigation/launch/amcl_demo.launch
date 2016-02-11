@@ -5,7 +5,7 @@
   
   <!-- Map server -->
 
-  <arg name="map_file" default="$(find abrobot_navigation)/maps/test3_map.yaml"/>
+  <arg name="map_file" default="$(find abrobot_navigation)/maps/test5_map.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <node name="arduino_controller" pkg="rosserial_python" type="serial_node.py" output= "screen">

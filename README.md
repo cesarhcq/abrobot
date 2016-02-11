@@ -166,7 +166,7 @@ There're two ways to run rplidar ros package
 2. Saving the Map
 
 ```
-rosrun map_server map_saver -f ~/ABRobot/src/abrobot/abrobot_navigation/maps/test_map
+rosrun map_server map_saver -f ~/guntherbot/src/abrobot/abrobot_navigation/maps/test_map
 ```
 
 3. Loading the map
@@ -247,4 +247,5 @@ Now, you can execute the launch file with roscore information
 ```export ROS_IP=10.42.0.98```
 
 ```rosrun rviz rviz```
+
 
