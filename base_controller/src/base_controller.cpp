@@ -5,7 +5,6 @@
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/Vector3.h>
 
 double L = 0.5; // distance between axes
@@ -24,11 +23,11 @@ double dth_encoder = 0;
 ros::Time encoder_time;
 bool init = false;
 
-void handle_vel_encoder(const geometry_msgs::Vector3Stamped& encoder) {
-  encoder_time = encoder.header.stamp;
-  encoder_left = encoder.vector.x;
-  encoder_right = encoder.vector.y;
-  encoder_dt = encoder.vector.z;
+void handle_vel_encoder(const geometry_msgs::Vector3& encoder) {
+  //encoder_time = encoder.header.stamp;
+  encoder_left = encoder.x;
+  encoder_right = encoder.y;
+  encoder_dt = encoder.z;
 
   //ROS_INFO("encoder_left %lf - encoder_right %lf", encoder.vector.x, encoder.vector.y);
 }
@@ -92,13 +91,13 @@ int main(int argc, char** argv){
     if(!init){
 
       reverse_kinematics();
-      last_time = encoder_time;
+      last_time = ros::Time::now();
       init = true;
 
     }else if(init){
 
       reverse_kinematics(); // return v_encoder and dth_encoder
-      current_time = encoder_time;
+      current_time = ros::Time::now();
       //compute odometry in a typical way given the velocities of the robot
       double dt = (current_time - last_time).toSec();
       //double dt = encoder_dt;

@@ -22,7 +22,7 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
 
     <!--Gyro from smartphone-->
     <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-        <param name="host" value="192.168.42.246" /> <!--Need to change everytime when reconnect the device-->
+        <param name="host" value="192.168.42.225" /> <!--Need to change everytime when reconnect the device-->
         <param name="num_callibration_itrs" value="1" />
         <param name="debug" value="false" />
     </node>
@@ -35,7 +35,7 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
 
 
     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
-        <param name="video_device" value="/dev/video1" />
+        <param name="video_device" value="/dev/video0" />
         <param name="image_width" value="640" />
         <param name="image_height" value="480" />
         <param name="pixel_format" value="yuyv" />
@@ -74,6 +74,15 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
         <param name="map_start_y" value="0.5"/>
 
     </node>
+
+    <arg name="geotiff_map_file_path" default="$(find hector_geotiff)/maps"/>
+
+    <param name="/use_sim_time" value="false"/>
+
+    <include file="$(find hector_geotiff)/launch/geotiff_mapper.launch">
+        <arg name="trajectory_source_frame_name" value="scanmatcher_frame"/>
+        <arg name="map_file_path" value="$(arg geotiff_map_file_path)"/>
+    </include>
 
     <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
 
