@@ -1,0 +1,307 @@
+<?xml version='1.0'?>
+
+<robot name="myrobot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find abrobot_description)/urdf/robot2.gazebo" />
+  <xacro:include filename="$(find abrobot_description)/urdf/materials.xacro" />
+  <!-- <xacro:include filename="$(find abrobot_description)/urdf/macros.xacro"/> -->
+
+
+  <!-- Base Robotic -->
+  <link name="base_link">
+    <inertial>
+      <mass value="2" />
+      <origin xyz="0 0 0.0" />
+      <inertia ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0" izz="0.5" />
+    </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.0095" radius="0.2245"/>
+        </geometry>
+        <material name ="veryDarkGrey" />
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.0095" radius="0.2245"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+
+  <!-- Bateria -->
+  <link name="battery_box">
+    <inertial>
+      <mass value="0.001" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
+        iyy="0.0001" iyz="0.0"
+        izz="0.0001" />
+    </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.1778 0.3366 0.0762" />
+        </geometry>
+        <material name ="veryDarkGrey" />
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.1778 0.3366 0.0762" />
+        </geometry>
+      </collision>
+  </link>
+
+  <joint name="battery_box_joint" type="fixed">
+    <origin xyz="0 0 -0.04285" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="battery_box" />
+  </joint>
+
+
+
+  <!-- Roda Castor Frontal -->
+  <link name="front_caster">
+    <inertial>
+      <mass value="0.001" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
+          iyy="0.0001" iyz="0.0"
+          izz="0.0001" />
+    </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="-1.5707 0 1.5707" />
+        <geometry>
+          <mesh filename="package://abrobot_description/meshes/28971-Caster-Wheel-Kit-v1.0.stl"/>
+        </geometry>
+        <material name ="light_grey">
+          <color rgba="0.6 0.6 0.6 1"/>
+        </material>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="-1.5707 0 1.5707" />
+        <geometry>
+          <cylinder length="0.0605" radius="0.097"/>
+        </geometry>
+      </collision>
+  </link>
+
+  <joint name="front_caster_joint" type="fixed">
+    <origin xyz="0.18745 0 -0.00475" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="front_caster" />
+  </joint>  
+
+
+
+  <link name="rear_caster">
+    <inertial>
+      <mass value="0.001" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
+        iyy="0.0001" iyz="0.0"
+        izz="0.0001" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="-1.5707 0 1.5707" />
+        <geometry>
+          <mesh filename="package://abrobot_description/meshes/28971-Caster-Wheel-Kit-v1.0.stl"/>
+        </geometry>
+        <material name ="light_grey">
+          <color rgba="0.6 0.6 0.6 1"/>
+        </material>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="-1.5707 0 1.5707" />
+        <geometry>
+          <cylinder length="0.0605" radius="0.097"/>
+        </geometry>
+      </collision>
+  </link>
+
+  <joint name="rear_caster_joint" type="fixed">
+    <origin xyz="-0.18745 0 -0.00475" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="rear_caster" />
+  </joint>
+
+
+
+  <link name="left_axle_link">
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="0.01" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+        iyy="0.001" iyz="0.0" izz="0.001" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
+        <geometry>
+          <cylinder radius="0.00635" length = "0.00635"/>
+        </geometry>
+        <material name ="light_grey" />
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
+        <geometry>
+          <cylinder radius="0.00635" length = "0.00635"/>
+        </geometry>
+      </collision>
+  </link>
+
+  <joint name="left_axle_joint" type="fixed">
+    <origin xyz="0 0.171475 0.017" rpy="0 0 0"/>
+    <parent link="battery_box"/>
+    <child link="left_axle_link"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+
+
+  <link name="right_axle_link">
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="0.01" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+        iyy="0.001" iyz="0.0" izz="0.001" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
+        <geometry>
+          <cylinder radius="0.00635" length = "0.00635"/>
+        </geometry>
+        <material name ="light_grey" />
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
+        <geometry>
+          <cylinder radius="0.00635" length = "0.00635"/>
+        </geometry>
+      </collision>
+  </link>
+
+  <joint name="right_axle_joint" type="fixed">
+    <origin xyz="0 -0.171475 0.017" rpy="0 0 0"/>
+    <parent link="battery_box"/>
+    <child link="right_axle_link"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+
+
+  <link name="left_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="0.01" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+        iyy="0.001" iyz="0.0" izz="0.001" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
+        <geometry>
+          <cylinder radius="0.0762" length = "0.03175"/>
+        </geometry>
+        <material name ="black" />
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
+        <geometry>
+          <cylinder radius="0.0782" length = "0.03175"/>
+        </geometry>
+      </collision>
+  </link>
+
+  <joint name="left_wheel_joint" type="continuous">
+    <origin xyz="0 0.01905 0" rpy="0 0 0"/>
+    <parent link="left_axle_link"/>
+    <child link="left_wheel_link"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+
+
+  <link name="right_wheel_link">
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="0.01" />
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+        iyy="0.001" iyz="0.0" izz="0.001" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
+        <geometry>
+          <cylinder radius="0.0762" length = "0.03175"/>
+        </geometry>
+        <material name ="black" />
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
+        <geometry>
+          <cylinder radius="0.0782" length = "0.03175"/>
+        </geometry>
+      </collision>
+  </link>
+
+
+  <!-- Fixed because we never rotate it anyway, it is just for show -->
+  <!-- NOTE This may prevent gazebo from working with this model -->
+  <joint name="right_wheel_joint" type="continuous">
+    <origin xyz="0 -0.01905 0" rpy="0 0 0"/>
+    <parent link="right_axle_link"/>
+    <child link="right_wheel_link"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+
+
+  <!-- Rplidar Laser -->
+  <link name="base_laser">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="-0.06 0 -0.05" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://abrobot_description/meshes/rplidar.dae" scale="0.01 0.01 0.01" />
+      </geometry>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="laser_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz=".15 0 .05" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="base_laser"/>
+  </joint>
+
+</robot>
