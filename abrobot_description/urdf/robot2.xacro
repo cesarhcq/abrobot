@@ -284,7 +284,7 @@
     </collision>
 
     <visual>
-      <origin xyz="-0.06 0 -0.05" rpy="0 0 0"/>
+      <origin xyz="0 0 -0.025" rpy="0 0 0"/>
       <geometry>
         <mesh filename="package://abrobot_description/meshes/rplidar.dae" scale="0.01 0.01 0.01" />
       </geometry>
@@ -299,7 +299,7 @@
 
   <joint name="laser_joint" type="fixed">
     <axis xyz="0 1 0" />
-    <origin xyz=".15 0 .05" rpy="0 0 0"/>
+    <origin xyz=".15 0 .025" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="base_laser"/>
   </joint>
