@@ -224,7 +224,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
         <geometry>
-          <cylinder radius="0.0782" length = "0.03175"/>
+          <cylinder radius="0.076" length = "0.03175"/>
         </geometry>
       </collision>
   </link>
@@ -257,7 +257,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 1.5707 1.5707" />
         <geometry>
-          <cylinder radius="0.0782" length = "0.03175"/>
+          <cylinder radius="0.076" length = "0.03175"/>
         </geometry>
       </collision>
   </link>
@@ -284,9 +284,9 @@
     </collision>
 
     <visual>
-      <origin xyz="0 0 -0.025" rpy="0 0 0"/>
+      <origin xyz="0 0 -0.03" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://abrobot_description/meshes/rplidar2.dae" scale="0.01 0.01 0.01" />
+        <mesh filename="package://abrobot_description/meshes/rplidar.stl" scale="0.01 0.01 0.01" />
       </geometry>
     </visual>
 
