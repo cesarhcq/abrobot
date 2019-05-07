@@ -14,7 +14,6 @@ void messageCb( const geometry_msgs::Twist& msg){
 
 }
 
-
 ros::Subscriber<geometry_msgs::Twist> sub("/cmd_vel", &messageCb);
 
 
