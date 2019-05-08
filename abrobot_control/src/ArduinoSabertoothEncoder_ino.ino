@@ -1,8 +1,3 @@
-#define USBCON
-#include <SabertoothSimplified.h>
-
-SabertoothSimplified ST;
-
 // We'll name the Sabertooth object ST.
 // For how to configure the Sabertooth, see the DIP Switch Wizard for
 // https://www.dimensionengineering.com/datasheets/Sabertooth2x60.pdf
@@ -20,6 +15,27 @@ SabertoothSimplified ST;
 //   https://learn.parallax.com/tutorials/robot/arlo/arlo-robot-assembly-guide/section-1-motor-mount-and-wheel-kit-assembly/step-6
 //
 // If you want to use a pin other than TX->1, see the SoftwareSerial example.
+
+
+#define USBCON // RX and TX Arduino Leonardo - Sabertooth
+#define USE_USBCON // ROS Arduino Leonardo
+#define L 0.5 // distance between axes
+#define R 0.075 // wheel radius 
+
+#include <ArduinoHardware.h>
+#include <ros.h>
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Point32.h>
+#include <SabertoothSimplified.h>
+
+SabertoothSimplified ST;
+
+
+
+
+
+geometry_msgs::Twist vel_ref;
+geometry_msgs::Point32 vel_kinematic_robo;
 
 int val;
 int encoder0PinA_Left = 3;
@@ -40,18 +56,6 @@ bool flag = false;
 //Controller variable
 double epx = 0;
 int Converted_Gain = -40; // Start with this value for the wheel to start moving
-
-void setup()
-{
-  SabertoothTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
-  //Serial.begin(9600);
-  delay(1000);
-  pinMode (encoder0PinA_Right, INPUT);
-  pinMode (encoder0PinB_Right, INPUT);
-  pinMode (encoder0PinA_Left, INPUT);
-  pinMode (encoder0PinB_Left, INPUT);
-
-}
 
 void full_backward() {
   ST.motor(1, 127);
@@ -88,6 +92,52 @@ void full_left() {
   ST.motor(2, -127);
 }
 
+//ROS Function - Angular and linear Velocity Desired
+void velResp(const geometry_msgs::Twist& msg){
+  
+  //V - linear velocity disired
+  vel_ref.linear.x = msg.linear.x;
+
+  //W - angular velocity disired
+  vel_ref.angular.z = msg.angular.z;
+  
+}
+// Robot Differential Drive Kinematic
+void kinematic(){
+  
+  // left wheel
+  vel_kinematic_robo.x = ( (2*vel_ref.linear.x) - (vel_ref.angular.z*L) )/(2*R);
+  // right wheel
+  vel_kinematic_robo.y = ( (2*vel_ref.linear.x) + (vel_ref.angular.z*L) )/(2*R);
+}
+
+ros::NodeHandle  nh;
+//Subscribers
+ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &velResp);
+//Publisher
+ros::Publisher pub_kinematic("/vel_kinematic", &vel_kinematic_robo);
+ros::Publisher pub_encoder("/vel_encoder", &vel_ref);
+
+
+void setup()
+{
+  SabertoothTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
+  //Serial.begin(9600);
+  delay(1000);
+  pinMode (encoder0PinA_Right, INPUT);
+  pinMode (encoder0PinB_Right, INPUT);
+  pinMode (encoder0PinA_Left, INPUT);
+  pinMode (encoder0PinB_Left, INPUT);
+  
+// ROS Initialization with Publishers and Subscribers 
+
+  nh.initNode();
+  nh.subscribe(sub_rasp);
+  nh.advertise(pub_kinematic);
+  nh.advertise(pub_encoder);
+
+}
+
 //Front controlled speed with PI
 void encoder_Forward() {
   n = digitalRead(encoder0PinA_Left);
@@ -115,7 +165,8 @@ void encoder_Forward() {
   //Average speed of a wheel
   Media_vel = Sum_vel / encoder0Pos;
   //Setting the linear velocity input
-  float ref_velo = 0.5;
+  //float ref_velo = 0.5;
+  float ref_velo = vel_ref.linear.x;
   double erro = ref_velo - Media_vel;
   //Proportional gain
   double kp = 0.003;
@@ -197,21 +248,12 @@ void encoder_Right() {
 
 void loop()
 {
-  // Routine to rotate 360 degrees a wheel
-  //  if (encoder0Pos == 36) {
-  //    Stop();
-  //    delay(3000);
-  //    PreviusMillis = millis();
-  //    encoder0Pos = 0;
-  //  }
-
-
-  // Routine go forward turn 180 degrees and go back
-  //  if (flag == false) {
+  
   encoder_Forward();
-  //  }
-  //  if (flag == true) {
-  //    encoder_Right();
-  //  }
-
+  kinematic();
+  pub_kinematic.publish(&vel_kinematic_robo);
+  pub_encoder.publish(&vel_ref);
+  nh.spinOnce();
+  delay(1);
+  
 }
