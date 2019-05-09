@@ -70,12 +70,10 @@ void velResp(const geometry_msgs::Twist& msg){
 void VlRosController() {
   
   double Vl = vel_ref.linear.x;
-
-  float Vl_gain = round(127 * Vl / 0.6);
-
-  //output
-  ST.motor(1, 0);// Vl
-  ST.motor(2, Vl_gain);// vl
+  
+  // //output
+  // ST.motor(1, 0);// Vl
+  // ST.motor(2, Vl_gain);// vl
 
   // Tangential velocity measured by encoder sensor
   read_Left = digitalRead(encoder0PinA_Left);
@@ -107,6 +105,25 @@ void VlRosController() {
   //Integrative Gain
   double ki = 0.0003;
 
+  float Vl_gain = round(127 * Vl / 0.6);
+
+    ST.motor(1, 0);// Vl
+    ST.motor(2, Vl_gain);// vl
+
+  if(encoder0Pos_Left>=36*2){
+
+    ST.motor(1, 0);// Vl
+    ST.motor(2, 0);// vl
+    delay(3000);
+    encoder0Pos_Left=0;
+
+  }
+    
+
+
+
+ 
+
     // if (abs(erro) > 0.02) {
   //   //PID control
   //   double u = erro * kp + (erro + epx_Left) * ki;
@@ -117,8 +134,7 @@ void VlRosController() {
   // }
 
   //output
-  ST.motor(1, 0);// Vl
-  ST.motor(2, Vl_gain);// vl
+
 
 }
 
@@ -143,7 +159,7 @@ void setup()
 {
   SabertoothTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
   //Serial.begin(9600);
-  delay(1000);
+  delay(5000);
   pinMode (encoder0PinA_Left, INPUT);
   pinMode (encoder0PinB_Left, INPUT);
   pinMode (encoder0PinA_Left, INPUT);
@@ -161,7 +177,7 @@ void loop()
 {
   kinematic();
   VlRosController();
-  pub_kinematic.publish(&vel_kinematic_robo);
+  //pub_kinematic.publish(&vel_kinematic_robo);
   pub_encoder.publish(&vel_encoder_robo);
   nh.spinOnce();
   delay(1);
