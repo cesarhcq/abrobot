@@ -31,8 +31,8 @@
 SabertoothSimplified ST;
 
 geometry_msgs::Twist vel_ref;
-geometry_msgs::Point32 vel_kinematic_robo;
 geometry_msgs::Point32 vel_encoder_robo;
+geometry_msgs::Point32 vel_kinematic_robo;
 
 //Left wheel
 // int encoder0PinA_Left = 3;
@@ -52,7 +52,7 @@ float Sum_vel = 0;
 float PreviusMillis = 0;
 
 //Controller variable
-double epx_Left = 0;
+float epx_Left = 0;
 
 //ROS Function - Angular and linear Velocity Desired
 void velResp(const geometry_msgs::Twist& msg){
@@ -65,17 +65,31 @@ void velResp(const geometry_msgs::Twist& msg){
   
 }
 
+ros::NodeHandle  nh;
+//Subscribers
+ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &velResp);
+//Publisher
+ros::Publisher pub_encoder("/vel_encoder", &vel_encoder_robo);
+
+// Robot Differential Drive Kinematic
+void kinematic(){
+
+  vel_kinematic_robo.x = ( (2*vel_ref.linear.x) - (vel_ref.angular.z*L) )/2;  // Left wheel
+  vel_kinematic_robo.y = ( (2*vel_ref.linear.x) + (vel_ref.angular.z*L) )/2;  // Right wheel
+
+}
+
 // *********************************************
 //Left wheel control
-void VlRosController() {
-  
-  double Vl = vel_ref.linear.x;
-  
-  // //output
-  // ST.motor(1, 0);// Vl
-  // ST.motor(2, Vl_gain);// vl
+void RosController_Wheel_Left() {
 
-  // Tangential velocity measured by encoder sensor
+  kinematic();
+  float w_left = vel_kinematic_robo.x;
+
+  //Debug kinematic
+  vel_encoder_robo.z = w_left;
+
+  //Tangential velocity measured by encoder sensor - Vel_Left
   read_Left = digitalRead(encoder0PinA_Left);
   if ((encoderPinALast_Left == LOW) && (read_Left == HIGH)) {
     // if (digitalRead(encoder0PinB_Left) == HIGH) {
@@ -90,70 +104,50 @@ void VlRosController() {
       //Sum_vel = Sum_vel + vel;
     //}
   }
+
   encoderPinALast_Left = read_Left;
-  //Average speed of a wheel Vl
-  //double Media_Vl_encoder = Sum_vel / encoder0Pos_Left;
-  double Media_Vl_encoder = vel_Left;
+  //Average speed of a wheel V_linear
+  //float Media_Vl_encoder = Sum_vel / encoder0Pos_Left;
+  float w_left_encoder = vel_Left;
 
   //Publisher Encoder
-  vel_encoder_robo.x = Media_Vl_encoder;
+  vel_encoder_robo.x = w_left_encoder;
 
-  //Vl controll
-  double erro = Vl - Media_Vl_encoder;
+  //V_linear controll
+  float erro = w_left - w_left_encoder;
   //Proportional gain
-  double kp = 0.003;
+  float kp = 0.003;
   //Integrative Gain
-  double ki = 0.0003;
+  float ki = 0.0003;
 
-  float Vl_gain = round(127 * Vl / 0.6);
+  // // if (abs(erro) > 0.02) {
+  // //   //PID control
+  // //   float u = erro * kp + (erro + epx_Left) * ki;
+  // //   //Integrator Cumulative Error
+  // //   epx_Left = epx_Left + erro;
+  // //   //Speed saturation conversion
+  // //   Vl_gain = round(-127 * u / 0.6);
+  // // }
 
-    ST.motor(1, 0);// Vl
-    ST.motor(2, Vl_gain);// vl
-
-  if(encoder0Pos_Left>=36*2){
-
-    ST.motor(1, 0);// Vl
-    ST.motor(2, 0);// vl
-    delay(3000);
-    encoder0Pos_Left=0;
-
-  }
-    
-
-
-
- 
-
-    // if (abs(erro) > 0.02) {
-  //   //PID control
-  //   double u = erro * kp + (erro + epx_Left) * ki;
-  //   //Integrator Cumulative Error
-  //   epx_Left = epx_Left + erro;
-  //   //Speed saturation conversion
-  //   Vl_gain = round(-127 * u / 0.6);
-  // }
+  //convert sinal to volt
+  float Vl_gain = round((127 * w_left) / 0.6);
 
   //output
+  ST.motor(1, 0);// vr
+  ST.motor(2, Vl_gain);// vl
 
+  // if(encoder0Pos_Left>=36*2){
+
+  //   ST.motor(1, 0);// Vl
+  //   ST.motor(2, 0);// vr
+  //   delay(3000);
+  //   encoder0Pos_Left=0;
+
+  // }
 
 }
 
 // *********************************************
-// Robot Differential Drive Kinematic
-void kinematic(){
-  // left wheel
-  vel_kinematic_robo.x = ( (2*vel_ref.linear.x) - (vel_ref.angular.z*L) )/(2*R);
-  // Left wheel
-  vel_kinematic_robo.y = ( (2*vel_ref.linear.x) + (vel_ref.angular.z*L) )/(2*R);
-}
-
-ros::NodeHandle  nh;
-//Subscribers
-ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &velResp);
-//Publisher
-ros::Publisher pub_kinematic("/vel_kinematic", &vel_kinematic_robo);
-ros::Publisher pub_encoder("/vel_encoder", &vel_encoder_robo);
-
 
 void setup()
 {
@@ -168,16 +162,14 @@ void setup()
 // ROS Initialization with Publishers and Subscribers 
   nh.initNode();
   nh.subscribe(sub_rasp);
-  nh.advertise(pub_kinematic);
+  //nh.advertise(pub_kinematic);
   nh.advertise(pub_encoder);
 
 }
 
 void loop()
 {
-  kinematic();
-  VlRosController();
-  //pub_kinematic.publish(&vel_kinematic_robo);
+  RosController_Wheel_Left();
   pub_encoder.publish(&vel_encoder_robo);
   nh.spinOnce();
   delay(1);
