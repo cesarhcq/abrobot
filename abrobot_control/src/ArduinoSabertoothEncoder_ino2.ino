@@ -24,6 +24,7 @@
 
 #include <ArduinoHardware.h>
 #include <ros.h>
+#include <math.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Point32.h>
 #include <SabertoothSimplified.h>
@@ -41,7 +42,7 @@ geometry_msgs::Point32 vel_kinematic_robo;
 int encoder0PinA_Left = 3;
 int encoder0PinB_Left = 4;
 int encoderPinALast_Left = LOW;
-int encoder0Pos_Left = 0;
+int encoder0Pos_Left = 1;
 float vel_Left = 0;
 
 //Position encoder
@@ -55,6 +56,18 @@ int cont = 0;
 
 //Controller variable
 float epx_Left = 0;
+
+double arredondar(double valor, int casas, int ceilOrFloor) {
+    double arredondado = valor;
+    arredondado *= (pow(10, casas));
+    if (ceilOrFloor == 0) {
+        arredondado = ceil(arredondado);           
+    } else {
+        arredondado = floor(arredondado);
+    }
+    arredondado /= (pow(10, casas));
+    return arredondado;
+}
 
 //ROS Function - Angular and linear Velocity Desired
 void velResp(const geometry_msgs::Twist& msg){
@@ -107,8 +120,8 @@ void RosController_Wheel_Left() {
 
       cont++;
       if(cont>30){
-        Sum_vel = 0;
-        encoder0Pos_Left = 0;
+        Sum_vel = vel_Left;
+        encoder0Pos_Left = 1;
         cont = 0;
       }
 
@@ -118,28 +131,43 @@ void RosController_Wheel_Left() {
   encoderPinALast_Left = read_Left;
   //Average speed of a wheel V_linear
   float Media_Vl_encoder = Sum_vel / encoder0Pos_Left;
+
+  //Publish velocity left
   float w_left_encoder = vel_Left;
 
   //Publisher Encoder
   vel_encoder_robo.x = Media_Vl_encoder;
 
+  //convert sinal to volt
+  float Vl_gain;
+
   //V_linear controll erro = (cinematica - encoder)
-  float erro = w_left - Media_Vl_encoder;
+  float erro = abs(w_left) - Media_Vl_encoder;
   //Proportional gain
   float kp = 0.003;
   //Integrative Gain
   float ki = 0.0003;
 
-  //convert sinal to volt
-  float Vl_gain;
-
-  if (abs(erro) > 0.05) {
+  if (abs(erro) > 0.01) {
     //PID control
     float u = (erro * kp) + ((erro + epx_Left) * ki);
     //Integrator Cumulative Error
     epx_Left = epx_Left + erro;
-    //Speed saturation conversion
-    Vl_gain = round((127 * u) / 0.6);
+
+    if(w_left < 0){
+      u = u*(-1);
+    }
+    //u = arredondar(u,2,2);
+
+    if(w_left == 0){
+      //Speed saturation conversion
+      Media_Vl_encoder = 0;
+      encoder0Pos_Left = 1;
+      Sum_vel = 0;
+    }else{
+      //Speed saturation conversion
+      Vl_gain = round((127 * u)/0.3);
+    }
 
     //debug
     vel_encoder_robo.y = u;
@@ -147,29 +175,8 @@ void RosController_Wheel_Left() {
     //output
     ST.motor(1, 0);// vr
     ST.motor(2, Vl_gain);// vl
-  } else if(erro == NULL || erro <= 0.05){
-
-    Vl_gain = round((127 * w_left) / 0.6);
-    ST.motor(1, 0);// vr
-    ST.motor(2, Vl_gain);// vl
-
-  } else{
-
-    ST.motor(1, 0);// vr
-    ST.motor(2, 0);// vl
-
   }
   
-
-  // if(encoder0Pos_Left>=36*2){
-
-  //   ST.motor(1, 0);// Vl
-  //   ST.motor(2, 0);// vr
-  //   delay(3000);
-  //   encoder0Pos_Left=0;
-
-  // }
-
 }
 
 // *********************************************
