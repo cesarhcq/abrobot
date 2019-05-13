@@ -35,9 +35,10 @@ geometry_msgs::Twist vel_ref;
 geometry_msgs::Point32 vel_encoder_robo;
 geometry_msgs::Point32 vel_kinematic_robo;
 
-//Left wheel
+//Right wheel
 // int encoder0PinA_Left = 3;
 // int encoder0PinB_Left = 4;
+
 //Left wheel
 int encoder0PinA_Left = 3;
 int encoder0PinB_Left = 4;
@@ -98,7 +99,9 @@ void kinematic(){
 //Left wheel control
 void RosController_Wheel_Left() {
 
+  //Call the kinematic calcule
   kinematic();
+  //Call reference speed
   float w_left = vel_kinematic_robo.x;
 
   //Debug kinematic
@@ -118,6 +121,7 @@ void RosController_Wheel_Left() {
       vel_Left = w*R;
       Sum_vel = Sum_vel + vel_Left;
 
+      //Mean of velocity in 30 interations
       cont++;
       if(cont>30){
         Sum_vel = vel_Left;
@@ -154,13 +158,15 @@ void RosController_Wheel_Left() {
     //Integrator Cumulative Error
     epx_Left = epx_Left + erro;
 
+    //Change the sinal of controll
     if(w_left < 0){
       u = u*(-1);
     }
-    //u = arredondar(u,2,2);
+
+    u = arredondar(u,2,2);
 
     if(w_left == 0){
-      //Speed saturation conversion
+      //Reset commands
       Media_Vl_encoder = 0;
       encoder0Pos_Left = 1;
       Sum_vel = 0;
@@ -169,10 +175,10 @@ void RosController_Wheel_Left() {
       Vl_gain = round((127 * u)/0.3);
     }
 
-    //debug
+    //Degug-ROS
     vel_encoder_robo.y = u;
 
-    //output
+    //Output Motor Left
     ST.motor(1, 0);// vr
     ST.motor(2, Vl_gain);// vl
   }
