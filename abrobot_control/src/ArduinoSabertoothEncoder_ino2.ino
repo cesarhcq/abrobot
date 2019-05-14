@@ -36,8 +36,11 @@ geometry_msgs::Point32 vel_encoder_robo;
 geometry_msgs::Point32 vel_kinematic_robo;
 
 //Right wheel
-// int encoder0PinA_Left = 3;
-// int encoder0PinB_Left = 4;
+int encoder0PinA_Right = 5;
+int encoder0PinB_Right = 6;
+int encoderPinALast_Right= LOW;
+int encoder0Pos_Right = 1;
+float vel_Right = 0;
 
 //Left wheel
 int encoder0PinA_Left = 3;
@@ -46,16 +49,17 @@ int encoderPinALast_Left = LOW;
 int encoder0Pos_Left = 1;
 float vel_Left = 0;
 
-//Position encoder
+//Position encoder Left
 int read_Left = LOW;
-float Delta_t = 0;
-float Sum_t = 0;
-float Sum_vel = 0;
-float PreviusMillis = 0;
+float Delta_t_Left = 0;
+float Sum_t_Left = 0;
+float Sum_vel_Left = 0;
+float PreviusMillis_Left = 0;
+int cont_Right = 0;
+int cont_Left = 0;
 
-int cont = 0;
-
-//Controller variable
+//Controller variable Left
+float epx_Right = 0;
 float epx_Left = 0;
 
 double arredondar(double valor, int casas, int ceilOrFloor) {
@@ -113,20 +117,20 @@ void RosController_Wheel_Left() {
     // if (digitalRead(encoder0PinB_Left) == HIGH) {
       encoder0Pos_Left++;
       // Time between encoder signals
-      Delta_t = (millis() - PreviusMillis) * 0.001;
-      PreviusMillis = millis();
+      Delta_t_Left = (millis() - PreviusMillis_Left) * 0.001;
+      PreviusMillis_Left = millis();
 
       //Linear speed with respect to Theta = 10 degrees (encoder sensitivity) of wheel displacement of R = 7.5 cm radius.
-      float w = (10 * PI / 180) / (Delta_t);
+      float w = (10 * PI / 180) / (Delta_t_Left);
       vel_Left = w*R;
-      Sum_vel = Sum_vel + vel_Left;
+      Sum_vel_Left = Sum_vel_Left + vel_Left;
 
       //Mean of velocity in 30 interations
-      cont++;
-      if(cont>30){
-        Sum_vel = vel_Left;
+      cont_Left++;
+      if(cont_Left>30){
+        Sum_vel_Left = vel_Left;
         encoder0Pos_Left = 1;
-        cont = 0;
+        cont_Left = 0;
       }
 
     //}
@@ -134,7 +138,7 @@ void RosController_Wheel_Left() {
 
   encoderPinALast_Left = read_Left;
   //Average speed of a wheel V_linear
-  float Media_Vl_encoder = Sum_vel / encoder0Pos_Left;
+  float Media_Vl_encoder = Sum_vel_Left / encoder0Pos_Left;
 
   //Publish velocity left
   float w_left_encoder = vel_Left;
@@ -163,13 +167,14 @@ void RosController_Wheel_Left() {
       u = u*(-1);
     }
 
+    //round u
     u = arredondar(u,2,2);
 
     if(w_left == 0){
       //Reset commands
       Media_Vl_encoder = 0;
       encoder0Pos_Left = 1;
-      Sum_vel = 0;
+      Sum_vel_Left = 0;
     }else{
       //Speed saturation conversion
       Vl_gain = round((127 * u)/0.3);
