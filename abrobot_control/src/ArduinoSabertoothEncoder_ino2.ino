@@ -112,7 +112,7 @@ void kinematic(){
 void RosController_Wheel_Left() {
 
   //Call reference speed from kinematic
-  float w_left = vel_kinematic_robo.x;
+  float w_left = vel_kinematic_robo.x + (vel_kinematic_robo.x*0.067);
 
   //Debug kinematic
   //vel_encoder_robo.z = w_left;
@@ -158,11 +158,11 @@ void RosController_Wheel_Left() {
   //V_linear controll erro = (cinematica - encoder)
   float erro = abs(w_left) - Media_Vl_encoder;
   //Proportional gain
-  float kp = 0.003;
+  float kp = 0.2;
   //Integrative Gain
-  float ki = 0.0003;
+  float ki = 0.0008;
 
-  if (abs(erro) > 0.001) {
+  if (abs(erro) > 0.01) {
     //PID control
     float u = (erro * kp) + ((erro + epx_Left) * ki);
     //Integrator Cumulative Error
@@ -174,7 +174,7 @@ void RosController_Wheel_Left() {
     }
 
     //round u
-    u = arredondar(u,2,2);
+    //u = arredondar(u,2,2);
 
     if(w_left == 0){
       //Reset commands
@@ -184,17 +184,15 @@ void RosController_Wheel_Left() {
       epx_Left = 0;
     }else{
       //Speed saturation conversion
-      Vl_gain = round((127 * u)/0.3);
+      Vl_gain = round((127 * u)/0.6);
     }
 
     //Degug-ROS
     //vel_encoder_robo.y = u;
 
     //Output Motor Left
-    //ST.motor(1, 0);// vr
     ST.motor(2, Vl_gain);// vl
   }
-  
 }
 
 //Left wheel control
@@ -204,7 +202,7 @@ void RosController_Wheel_Right() {
   float w_right = vel_kinematic_robo.y;
 
   //Debug kinematic
-  vel_encoder_robo.z = w_right;
+  vel_encoder_robo.z = w_right;// - (w_right*0.004);
 
   //Tangential velocity measured by encoder sensor - Vel_Left
   read_Right = digitalRead(encoder0PinA_Right);
@@ -247,11 +245,11 @@ void RosController_Wheel_Right() {
   //V_linear controll erro = (cinematica - encoder)
   float erro = abs(w_right) - Media_Vr_encoder;
   //Proportional gain
-  float kp = 0.003;
+  float kp = 0.2;
   //Integrative Gain
-  float ki = 0.0003;
+  float ki = 0.0008;
 
-  if (abs(erro) > 0.001) {
+  if (abs(erro) > 0.01) {
     //PID control
     float u = (erro * kp) + ((erro + epx_Right) * ki);
     //Integrator Cumulative Error
@@ -263,7 +261,7 @@ void RosController_Wheel_Right() {
     }
 
     //round u
-    u = arredondar(u,2,2);
+    //u = arredondar(u,2,2);
 
     if(w_right == 0){
       //Reset commands
@@ -273,7 +271,7 @@ void RosController_Wheel_Right() {
       epx_Right = 0;
     }else{
       //Speed saturation conversion
-      Vl_gain = round((127 * u)/0.3);
+      Vl_gain = round((127 * u)/0.6);
     }
 
     //Degug-ROS
@@ -281,7 +279,6 @@ void RosController_Wheel_Right() {
 
     //Output Motor Left
     ST.motor(1, -Vl_gain);// vr
-    //ST.motor(2, 0);// vl
   }
   
 }
@@ -309,8 +306,8 @@ void setup()
 void loop()
 {
   kinematic();
-  RosController_Wheel_Right();
   RosController_Wheel_Left();
+  RosController_Wheel_Right();
   pub_encoder.publish(&vel_encoder_robo);
   nh.spinOnce();
   delay(1);
