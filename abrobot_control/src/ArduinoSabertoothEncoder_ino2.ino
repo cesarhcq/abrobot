@@ -55,12 +55,20 @@ float Delta_t_Left = 0;
 float Sum_t_Left = 0;
 float Sum_vel_Left = 0;
 float PreviusMillis_Left = 0;
-int cont_Right = 0;
 int cont_Left = 0;
 
-//Controller variable Left
+//Position encoder Right
+int read_Right = LOW;
+float Delta_t_Right = 0;
+float Sum_t_Right = 0;
+float Sum_vel_Right = 0;
+float PreviusMillis_Right = 0;
+int cont_Right = 0;
+
+//Controller variable
 float epx_Right = 0;
 float epx_Left = 0;
+
 
 double arredondar(double valor, int casas, int ceilOrFloor) {
     double arredondado = valor;
@@ -103,13 +111,11 @@ void kinematic(){
 //Left wheel control
 void RosController_Wheel_Left() {
 
-  //Call the kinematic calcule
-  kinematic();
-  //Call reference speed
+  //Call reference speed from kinematic
   float w_left = vel_kinematic_robo.x;
 
   //Debug kinematic
-  vel_encoder_robo.z = w_left;
+  //vel_encoder_robo.z = w_left;
 
   //Tangential velocity measured by encoder sensor - Vel_Left
   read_Left = digitalRead(encoder0PinA_Left);
@@ -144,7 +150,7 @@ void RosController_Wheel_Left() {
   float w_left_encoder = vel_Left;
 
   //Publisher Encoder
-  vel_encoder_robo.x = Media_Vl_encoder;
+  vel_encoder_robo.x = w_left_encoder;
 
   //convert sinal to volt
   float Vl_gain;
@@ -156,7 +162,7 @@ void RosController_Wheel_Left() {
   //Integrative Gain
   float ki = 0.0003;
 
-  if (abs(erro) > 0.01) {
+  if (abs(erro) > 0.001) {
     //PID control
     float u = (erro * kp) + ((erro + epx_Left) * ki);
     //Integrator Cumulative Error
@@ -175,17 +181,107 @@ void RosController_Wheel_Left() {
       Media_Vl_encoder = 0;
       encoder0Pos_Left = 1;
       Sum_vel_Left = 0;
+      epx_Left = 0;
     }else{
       //Speed saturation conversion
       Vl_gain = round((127 * u)/0.3);
     }
 
     //Degug-ROS
-    vel_encoder_robo.y = u;
+    //vel_encoder_robo.y = u;
 
     //Output Motor Left
-    ST.motor(1, 0);// vr
+    //ST.motor(1, 0);// vr
     ST.motor(2, Vl_gain);// vl
+  }
+  
+}
+
+//Left wheel control
+void RosController_Wheel_Right() {
+
+  //Call reference speed from kinematic
+  float w_right = vel_kinematic_robo.y;
+
+  //Debug kinematic
+  vel_encoder_robo.z = w_right;
+
+  //Tangential velocity measured by encoder sensor - Vel_Left
+  read_Right = digitalRead(encoder0PinA_Right);
+  if ((encoderPinALast_Right == LOW) && (read_Right == HIGH)) {
+    // if (digitalRead(encoder0PinB_Left) == HIGH) {
+      encoder0Pos_Right++;
+      // Time between encoder signals
+      Delta_t_Right = (millis() - PreviusMillis_Right) * 0.001;
+      PreviusMillis_Right = millis();
+
+      //Linear speed with respect to Theta = 10 degrees (encoder sensitivity) of wheel displacement of R = 7.5 cm radius.
+      float w = (10 * PI / 180) / (Delta_t_Right);
+      vel_Right = w*R;
+      Sum_vel_Right = Sum_vel_Right + vel_Right;
+
+      //Mean of velocity in 30 interations
+      cont_Right++;
+      if(cont_Right>30){
+        Sum_vel_Right = vel_Right;
+        encoder0Pos_Right = 1;
+        cont_Right = 0;
+      }
+
+    //}
+  }
+
+  encoderPinALast_Right = read_Right;
+  //Average speed of a wheel V_linear
+  float Media_Vr_encoder = Sum_vel_Right / encoder0Pos_Right;
+
+  //Publish velocity left
+  float w_right_encoder = vel_Right;
+
+  //Publisher Encoder
+  vel_encoder_robo.y = w_right_encoder;
+
+  //convert sinal to volt
+  float Vl_gain;
+
+  //V_linear controll erro = (cinematica - encoder)
+  float erro = abs(w_right) - Media_Vr_encoder;
+  //Proportional gain
+  float kp = 0.003;
+  //Integrative Gain
+  float ki = 0.0003;
+
+  if (abs(erro) > 0.001) {
+    //PID control
+    float u = (erro * kp) + ((erro + epx_Right) * ki);
+    //Integrator Cumulative Error
+    epx_Right = epx_Right + erro;
+
+    //Change the sinal of controll
+    if(w_right < 0){
+      u = u*(-1);
+    }
+
+    //round u
+    u = arredondar(u,2,2);
+
+    if(w_right == 0){
+      //Reset commands
+      Media_Vr_encoder = 0;
+      encoder0Pos_Right = 1;
+      Sum_vel_Right = 0;
+      epx_Right = 0;
+    }else{
+      //Speed saturation conversion
+      Vl_gain = round((127 * u)/0.3);
+    }
+
+    //Degug-ROS
+    //vel_encoder_robo.y = u;
+
+    //Output Motor Left
+    ST.motor(1, -Vl_gain);// vr
+    //ST.motor(2, 0);// vl
   }
   
 }
@@ -197,8 +293,8 @@ void setup()
   SabertoothTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
   //Serial.begin(9600);
   delay(5000);
-  pinMode (encoder0PinA_Left, INPUT);
-  pinMode (encoder0PinB_Left, INPUT);
+  pinMode (encoder0PinA_Right, INPUT);
+  pinMode (encoder0PinB_Right, INPUT);
   pinMode (encoder0PinA_Left, INPUT);
   pinMode (encoder0PinB_Left, INPUT);
   
@@ -212,6 +308,8 @@ void setup()
 
 void loop()
 {
+  kinematic();
+  RosController_Wheel_Right();
   RosController_Wheel_Left();
   pub_encoder.publish(&vel_encoder_robo);
   nh.spinOnce();
