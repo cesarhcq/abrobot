@@ -112,7 +112,7 @@ void kinematic(){
 void RosController_Wheel_Left() {
 
   //Call reference speed from kinematic
-  float w_left = vel_kinematic_robo.x + (vel_kinematic_robo.x*0.067);
+  float w_left = vel_kinematic_robo.x + (vel_kinematic_robo.x*0.0672);
 
   //Debug kinematic
   //vel_encoder_robo.z = w_left;
