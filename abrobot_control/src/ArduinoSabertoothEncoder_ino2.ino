@@ -26,14 +26,14 @@
 #include <ros.h>
 #include <math.h>
 #include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Point32.h>
+#include <geometry_msgs/Vector3Stamped.h>
 #include <SabertoothSimplified.h>
 
 SabertoothSimplified ST;
 
 geometry_msgs::Twist vel_ref;
-geometry_msgs::Point32 vel_encoder_robo;
-geometry_msgs::Point32 vel_kinematic_robo;
+geometry_msgs::Vector3Stamped vel_encoder_robo;
+geometry_msgs::Vector3Stamped vel_kinematic_robo;
 
 //Right wheel
 int encoder0PinA_Right = 5;
@@ -70,17 +70,17 @@ float epx_Right = 0;
 float epx_Left = 0;
 
 
-double arredondar(double valor, int casas, int ceilOrFloor) {
-    double arredondado = valor;
-    arredondado *= (pow(10, casas));
-    if (ceilOrFloor == 0) {
-        arredondado = ceil(arredondado);           
-    } else {
-        arredondado = floor(arredondado);
-    }
-    arredondado /= (pow(10, casas));
-    return arredondado;
-}
+// double arredondar(double valor, int casas, int ceilOrFloor) {
+//     double arredondado = valor;
+//     arredondado *= (pow(10, casas));
+//     if (ceilOrFloor == 0) {
+//         arredondado = ceil(arredondado);           
+//     } else {
+//         arredondado = floor(arredondado);
+//     }
+//     arredondado /= (pow(10, casas));
+//     return arredondado;
+// }
 
 //ROS Function - Angular and linear Velocity Desired
 void velResp(const geometry_msgs::Twist& msg){
@@ -283,6 +283,15 @@ void RosController_Wheel_Right() {
   
 }
 
+void publishEncoder(unsigned long time) {
+  vel_encoder_robo.header.stamp = nh.now();
+  vel_encoder_robo.vector.x = rpm_act1;
+  vel_encoder_robo.vector.y = rpm_act2;
+  vel_encoder_robo.vector.z = double(time)/1000;
+  pub_encoder.publish(&vel_encoder_robo);
+  nh.spinOnce();
+}
+
 // *********************************************
 
 void setup()
@@ -305,10 +314,10 @@ void setup()
 
 void loop()
 {
+  nh.spinOnce();
   kinematic();
   RosController_Wheel_Left();
   RosController_Wheel_Right();
-  pub_encoder.publish(&vel_encoder_robo);
-  nh.spinOnce();
+  publishEncoder();
   delay(1);
 }
