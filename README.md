@@ -10,5 +10,10 @@ Version | ROS Version | Operating System
 ## Steps to create the GuntherBOT based on ROS and Gazebo Simulator
 
 
+```
+rosrun rosserial_python serial_node.py /dev/ttyUSB0
+```
 
-
+```
+rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+```
