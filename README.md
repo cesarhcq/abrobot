@@ -8,9 +8,9 @@ Version | ROS devel | Operating System
 
 ## Install dependencies and follow the installation instructions.
 
-- [x] ROS Kinetic-devel. [ROS](http://wiki.ros.org/kinetic/Installation/Ubuntu).
-- [x] ROS Navigation Stack. [ROS-Planning](https://github.com/ros-planning/navigation).
-- [x] Rosserial. [Package for Arduino - Real Robot](http://wiki.ros.org/rosserial).
+- [x] ROS Kinetic-devel: [ROS](http://wiki.ros.org/kinetic/Installation/Ubuntu).
+- [x] ROS Navigation Stack: [ROS-Planning](https://github.com/ros-planning/navigation).
+- [x] Rosserial: [Package for Arduino - Real Robot](http://wiki.ros.org/rosserial).
 
 
 ## Steps to create the GuntherBOT based on ROS and Gazebo Simulator
@@ -56,7 +56,7 @@ $ roslaunch abrobot_gazebo second.launch
 
 ![guntherBOT](https://user-images.githubusercontent.com/15223825/57947842-64adbf00-78b6-11e9-944c-1244ae82ffaa.jpg)
 
-3. 
+3. Edit world or insert more objects for SLAM
 
 
 
