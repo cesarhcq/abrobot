@@ -21,19 +21,31 @@ Version | ROS Distro | Operating System
 
 ## Steps to clone this repository
 
-1. Create a simple ROS Workspace - if you don't have yet.
+1. Create a simple ROS Workspace - if you don't have yet. Following the installation instructions.
 
 ```
 $ mkdir -p ~/guntherBot_ws/src && cd ~/guntherBot_ws
 
 $ catkin init
 
-$ cd ~/guntherBot_ws/src/ git clone -b cesar-working https://github.com/cesarhcq/abrobot.git
+$ cd ~/guntherBot_ws/src/ 
+
+$ git clone -b cesar-working https://github.com/cesarhcq/abrobot.git
 
 $ cd ~/guntherBot_ws/
 
 $ catkin_make
 
+```
+
+2. Start a simple simulation of the GuntherBOT mobile Robot.
+
+```
+$ cd ~/guntherBot_ws/
+
+$ source devel/setup.bash
+
+$ roslaunch abrobot_gazebo second.launch
 ```
 
 
