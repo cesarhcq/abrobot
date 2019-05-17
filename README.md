@@ -11,7 +11,7 @@ Version | ROS Version | Operating System
 
 
 ```
-rosrun rosserial_python serial_node.py /dev/ttyUSB0
+rosrun rosserial_python serial_node.py _port:=/dev/ttyACM1 _baud:=57600
 ```
 
 ```

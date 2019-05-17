@@ -298,7 +298,6 @@ void setup()
 // ROS Initialization with Publishers and Subscribers 
   nh.initNode();
   nh.subscribe(sub_rasp);
-  //nh.advertise(pub_kinematic);
   nh.advertise(pub_encoder);
 
 }

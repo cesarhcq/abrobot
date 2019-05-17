@@ -258,8 +258,8 @@ void RosController_Wheel_Right() {
     }else{
       //Speed saturation conversion
       Vl_gain = round((127 * u)/0.6);
-      Vl_gain = constrain(Vl_gain,-127,127);
-      vel_encoder_robo.vector.z = Vl_gain;
+      //Vl_gain = constrain(Vl_gain,-127,127);
+     // vel_encoder_robo.vector.z = Vl_gain;
     }
 
     //Degug-ROS
@@ -276,12 +276,12 @@ void publishEncoder() {
   if(vel_kinematic_robo.x < 0) vel_Left = vel_Left*(-1);
   if(vel_kinematic_robo.y < 0) vel_Right = vel_Right*(-1);
 
-  //vel_encoder_robo.header.stamp = nh.now();
-  //vel_encoder_robo.vector.x = vel_Left;
-  //vel_encoder_robo.vector.y = vel_Right;
+  vel_encoder_robo.header.stamp = nh.now();
+  vel_encoder_robo.vector.x = vel_Left;
+  vel_encoder_robo.vector.y = vel_Right;
   //vel_encoder_robo.vector.z = 0;
-  //pub_encoder.publish(&vel_encoder_robo);
-  //nh.spinOnce();
+  pub_encoder.publish(&vel_encoder_robo);
+  nh.spinOnce();
 }
 
 // *********************************************
@@ -310,6 +310,6 @@ void loop()
   kinematic();
   RosController_Wheel_Left();
   RosController_Wheel_Right();
-  //publishEncoder();
+  publishEncoder();
   delay(1);
 }
