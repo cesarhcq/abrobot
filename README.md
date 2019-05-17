@@ -2,9 +2,15 @@
 
 GuntherBOT is an autonomous mobile robot developed by [Acta Visio](http://www.acta-visio.com) for warehouse indoor environments. GuntherBOT is based on Arlo Robot as mobile platform to perform different tasks in an indoor environments. GuntherBOT was developed with Robot Operating System (ROS) - see more in [ROS Wiki](https://www.ros.org/), Arduino Leonardo and Raspberry Pi 3B.
 
-Version | ROS Distro | Operating System
+Version | ROS devel | Operating System
 ------------ | ------------- | ------------
 1.0 | Kinetic Kame | Ubuntu 16.04 LTS (Xenial)
+
+## Install dependencies and follow the installation instructions.
+
+- [x] ROS Kinetic-devel. [ROS](http://wiki.ros.org/kinetic/Installation/Ubuntu).
+- [x] ROS Navigation Stack. [ROS-Planning](https://github.com/ros-planning/navigation).
+- [x] Rosserial. [Package for Arduino - Real Robot](http://wiki.ros.org/rosserial).
 
 
 ## Steps to create the GuntherBOT based on ROS and Gazebo Simulator
@@ -49,6 +55,8 @@ $ roslaunch abrobot_gazebo second.launch
 ```
 
 ![guntherBOT](https://user-images.githubusercontent.com/15223825/57947842-64adbf00-78b6-11e9-944c-1244ae82ffaa.jpg)
+
+3. 
 
 
 
