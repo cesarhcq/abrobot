@@ -11,7 +11,15 @@ Version | ROS Version | Operating System
 
 
 ```
-rosrun rosserial_python serial_node.py _port:=/dev/ttyACM1 _baud:=57600
+rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
+```
+
+```
+rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+```
+
+```
+rosrun base_controller base_controller
 ```
 
 ```
