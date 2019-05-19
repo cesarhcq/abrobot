@@ -30,7 +30,7 @@ void reverse_kinematics(){
   vx = (encoder_left + encoder_right)/2;
   vth = (encoder_left - encoder_right)/L;
 
-  ROS_INFO("kinematics - vx %lf - vth %lf", vx, vth);
+  //ROS_INFO("kinematics - vx %lf - vth %lf", vx, vth);
 }
 
 int main(int argc, char** argv){
@@ -81,7 +81,7 @@ int main(int argc, char** argv){
       th += delta_th;
 
       //ROS_INFO("encoder_left %lf - encoder_right %lf - time: %lf", encoder_left, encoder_right, encoder_time.toSec());
-      ROS_INFO("function - vx %lf - vth %lf", vx, vth);
+      ROS_INFO("DEBUG - vx %lf - vth %lf", vx, vth);
 
       //since all odometry is 6DOF we'll need a quaternion created from yaw
       geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
@@ -114,7 +114,44 @@ int main(int argc, char** argv){
         //set the velocity
       odom.child_frame_id = "base_link";
       odom.twist.twist.linear.x = vx;
+      odom.twist.twist.linear.y = 0;
+      odom.twist.twist.linear.z = 0;
+      odom.twist.twist.angular.z = 0;
+      odom.twist.twist.angular.z = 0;
       odom.twist.twist.angular.z = vth;
+
+      if (encoder_left == 0 && encoder_right == 0){
+        odom.pose.covariance[0] = 1e-9;
+        odom.pose.covariance[7] = 1e-3;
+        odom.pose.covariance[8] = 1e-9;
+        odom.pose.covariance[14] = 1e6;
+        odom.pose.covariance[21] = 1e6;
+        odom.pose.covariance[28] = 1e6;
+        odom.pose.covariance[35] = 1e-9;
+        odom.twist.covariance[0] = 1e-9;
+        odom.twist.covariance[7] = 1e-3;
+        odom.twist.covariance[8] = 1e-9;
+        odom.twist.covariance[14] = 1e6;
+        odom.twist.covariance[21] = 1e6;
+        odom.twist.covariance[28] = 1e6;
+        odom.twist.covariance[35] = 1e-9;
+      }
+      else{
+        odom.pose.covariance[0] = 1e-3;
+        odom.pose.covariance[7] = 1e-3;
+        odom.pose.covariance[8] = 0.0;
+        odom.pose.covariance[14] = 1e6;
+        odom.pose.covariance[21] = 1e6;
+        odom.pose.covariance[28] = 1e6;
+        odom.pose.covariance[35] = 1e3;
+        odom.twist.covariance[0] = 1e-3;
+        odom.twist.covariance[7] = 1e-3;
+        odom.twist.covariance[8] = 0.0;
+        odom.twist.covariance[14] = 1e6;
+        odom.twist.covariance[21] = 1e6;
+        odom.twist.covariance[28] = 1e6;
+        odom.twist.covariance[35] = 1e3;
+      }
 
         //publish the message
       odom_pub.publish(odom);
