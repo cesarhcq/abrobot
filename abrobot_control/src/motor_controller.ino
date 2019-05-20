@@ -278,10 +278,10 @@ void publishEncoder() {
   if(vel_kinematic_robo.y == 0) vel_Right = 0;
 
   vel_encoder_robo.header.stamp = nh.now();
-// using kinematic
+  // using kinematic
   //vel_encoder_robo.vector.x = vel_kinematic_robo.x;
   //vel_encoder_robo.vector.y = vel_kinematic_robo.y;
-// using encoder sensor
+  // using encoder sensor
   vel_encoder_robo.vector.x = vel_Left;
   vel_encoder_robo.vector.y = vel_Right;
   //vel_encoder_robo.vector.z = 0;
