@@ -159,9 +159,6 @@ void RosController_Wheel_Left() {
       u = u*(-1);
     }
 
-    //round u
-    //u = arredondar(u,2,2);
-
     if(w_left == 0){
       //Reset commands
       Media_Vl_encoder = 0;
@@ -245,9 +242,6 @@ void RosController_Wheel_Right() {
     if(w_right < 0){
       u = u*(-1);
     }
-
-    //round u
-    //u = arredondar(u,2,2);
 
     if(w_right == 0){
       //Reset commands
