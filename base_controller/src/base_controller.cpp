@@ -30,7 +30,7 @@ void reverse_kinematics(){
   vx = (encoder_left + encoder_right)/2;
   vth = (encoder_left - encoder_right)/L;
 
-  //ROS_INFO("kinematics - vx %lf - vth %lf", vx, vth);
+  ROS_INFO("kinematics - vx %lf - vth %lf", vx, vth);
 }
 
 int main(int argc, char** argv){
@@ -81,7 +81,7 @@ int main(int argc, char** argv){
       th += delta_th;
 
       //ROS_INFO("encoder_left %lf - encoder_right %lf - time: %lf", encoder_left, encoder_right, encoder_time.toSec());
-      ROS_INFO("DEBUG - vx %lf - vth %lf", vx, vth);
+      //ROS_INFO("DEBUG - vx %lf - vth %lf", vx, vth);
 
       //since all odometry is 6DOF we'll need a quaternion created from yaw
       geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
