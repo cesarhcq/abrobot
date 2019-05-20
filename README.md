@@ -30,28 +30,28 @@ Version | ROS Distro | Operating System
 1. Create a simple ROS Workspace - if you don't have yet. Following the installation instructions.
 
 ```
-$ mkdir -p ~/guntherBot_ws/src && cd ~/guntherBot_ws
+mkdir -p ~/guntherBot_ws/src && cd ~/guntherBot_ws
 
-$ catkin init
+catkin init
 
-$ cd ~/guntherBot_ws/src/ 
+cd ~/guntherBot_ws/src/ 
 
-$ git clone -b cesar-working https://github.com/cesarhcq/abrobot.git
+git clone -b cesar-working https://github.com/cesarhcq/abrobot.git
 
-$ cd ~/guntherBot_ws/
+cd ~/guntherBot_ws/
 
-$ catkin_make
+catkin_make
 
 ```
 
 2. Start a simple simulation of the GuntherBOT mobile Robot.
 
 ```
-$ cd ~/guntherBot_ws/
+cd ~/guntherBot_ws/
 
-$ source devel/setup.bash
+source devel/setup.bash
 
-$ roslaunch abrobot_gazebo second.launch
+roslaunch abrobot_gazebo second.launch
 ```
 
 ![guntherBOT](https://user-images.githubusercontent.com/15223825/57947842-64adbf00-78b6-11e9-944c-1244ae82ffaa.jpg)
@@ -113,15 +113,15 @@ After simulation, you need to do the experiments in real world. It is very impor
 1. Plug the Arduino USB cable in the Raspberry Pi 3. Now, open the Arduino IDE to verify what's the USB port connected. If you are not installed Arduino IDE in the Raspberry Pi 3, you can follow this instructions.
 
 ```
-$ sudo apt-get update
+sudo apt-get update
 ```
 ```
-$ sudo apt-get install arduino arduino-core
+sudo apt-get install arduino arduino-core
 ```
 Now, install the ROSSERIAL
 
 ```
-$ sudo apt-get install ros-kinetic-rosserial-arduino
+sudo apt-get install ros-kinetic-rosserial-arduino
 ```
 ```
 sudo apt-get install ros-kinetic-rosserial
@@ -132,10 +132,10 @@ After IDE Arduino installed, you'll need to install the **ros_lib library**
 The link between ROS and Arduino is through the ros_lib library. This library will be used as any other Arduino library. To install the ros_lib library, type the following commands in the Ubuntu terminal:
 
 ```
-$ cd <sketchbook>/libraries
+cd <sketchbook>/libraries
 ```
 ```
-$ rosrun rosserial_arduino make_libraries.py .
+rosrun rosserial_arduino make_libraries.py .
 ```
 
 Close the Arduino IDE and open again. Go to **sketchbook** in the Arduino IDE, and you will see the *ROS_LIB*
@@ -145,6 +145,17 @@ Verify the *serial_port* connected. In our case is:
 > /dev/ttyACM0
 
 
+### How to run rplidar ros package
+
+Check the authority of rplidar's serial-port:
+```
+ls -l /dev |grep ttyUSB
+```
+Add the authority of write: (such as /dev/ttyUSB0)
+```
+sudo chmod 666 /dev/ttyUSB0
+```
+There're two ways to run rplidar ros package
 
 
 
