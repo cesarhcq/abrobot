@@ -157,6 +157,31 @@ sudo chmod 666 /dev/ttyUSB0
 ```
 There're two ways to run rplidar ros package
 
+### Simultaneous Localization and Mapping (SLAM) - ROS Navigation Stack
+
+#### Mapping
+
+1. Saving the Map
+
+```
+rosrun map_server map_saver -f ~/ABRobot/src/abrobot/abrobot_navigation/maps/test_map
+```
+
+2. Loading the map
+
+```
+roslaunch abrobot_navigation amcl_demo.launch
+```
+
+3. Rviz visualization
+
+```
+roslaunch mybot_description mybot_rviz_amcl.launch
+```
+
+
+
+
 
 
 
