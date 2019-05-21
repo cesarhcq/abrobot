@@ -1,12 +1,12 @@
 TrajectoryPlannerROS:
-  max_vel_x: 0.5
+  max_vel_x: 0.3
   min_vel_x: 0.01
-  max_vel_theta: 1.5
+  max_vel_theta: 1.0
   min_in_place_vel_theta: 0.01
 
-  acc_lim_theta: 1.5
-  acc_lim_x: 0.5
-  acc_lim_y: 0.5
+  acc_lim_theta: 1.0
+  acc_lim_x: 0.3
+  acc_lim_y: 0.3
 
 
   holonomic_robot: false

@@ -49,7 +49,7 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
         <param name="map_update_distance_thresh" value="0.02"/>
         <param name="map_update_angle_thresh" value="0.1"/>
 
-        <param name="map_resolution" value="0.08"/>
+        <param name="map_resolution" value="0.05"/>
         <param name="map_size" value="1024"/>
         <param name="map_start_x" value="0.5"/>
         <param name="map_start_y" value="0.5"/>
