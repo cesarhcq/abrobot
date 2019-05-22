@@ -89,18 +89,18 @@ int main(int argc, char** argv){
       geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
       //first, we'll publish the transform over tf
-      geometry_msgs::TransformStamped odom_trans;
-      odom_trans.header.stamp = current_time;
-      odom_trans.header.frame_id = "odom";
-      odom_trans.child_frame_id = "base_link";
+      // geometry_msgs::TransformStamped odom_trans;
+      // odom_trans.header.stamp = current_time;
+      // odom_trans.header.frame_id = "odom";
+      // odom_trans.child_frame_id = "base_link";
 
-      odom_trans.transform.translation.x = x;
-      odom_trans.transform.translation.y = y;
-      odom_trans.transform.translation.z = 0.1;
-      odom_trans.transform.rotation = odom_quat;
+      // odom_trans.transform.translation.x = x;
+      // odom_trans.transform.translation.y = y;
+      // odom_trans.transform.translation.z = 0.0;
+      // odom_trans.transform.rotation = odom_quat;
 
-      //send the transform
-      odom_broadcaster.sendTransform(odom_trans);
+      // //send the transform
+      // odom_broadcaster.sendTransform(odom_trans);
 
       //next, we'll publish the odometry message over ROS
       nav_msgs::Odometry odom;
@@ -110,7 +110,7 @@ int main(int argc, char** argv){
       //set the position
       odom.pose.pose.position.x = x;
       odom.pose.pose.position.y = y;
-      odom.pose.pose.position.z = 0.1;
+      odom.pose.pose.position.z = 0.0;
       odom.pose.pose.orientation = odom_quat;
 
       //set the velocity
@@ -118,43 +118,39 @@ int main(int argc, char** argv){
       odom.twist.twist.linear.x = vx;
       odom.twist.twist.linear.y = 0;
       odom.twist.twist.linear.z = 0;
-      odom.twist.twist.angular.z = 0;
-      odom.twist.twist.angular.z = 0;
+      odom.twist.twist.angular.x = 0;
+      odom.twist.twist.angular.y = 0;
       odom.twist.twist.angular.z = vth;
 
       //set the covariance
-      if (encoder_left == 0 && encoder_right == 0){
-        odom.pose.covariance[0] = 1e-9;
-        odom.pose.covariance[7] = 1e-3;
-        odom.pose.covariance[8] = 1e-9;
-        odom.pose.covariance[14] = 1e6;
-        odom.pose.covariance[21] = 1e6;
-        odom.pose.covariance[28] = 1e6;
-        odom.pose.covariance[35] = 1e-9;
-        odom.twist.covariance[0] = 1e-9;
-        odom.twist.covariance[7] = 1e-3;
-        odom.twist.covariance[8] = 1e-9;
+      // if (encoder_left == 0 && encoder_right == 0){
+        odom.pose.covariance[0] = 5.0;
+        odom.pose.covariance[7] = 5.0;
+        odom.pose.covariance[14] = 1e-3;
+        odom.pose.covariance[21] = 0.1;
+        odom.pose.covariance[28] = 0.1;
+        odom.pose.covariance[35] = 0.1;
+        odom.twist.covariance[0] = 1.0;
+        odom.twist.covariance[7] = 1e6;
         odom.twist.covariance[14] = 1e6;
         odom.twist.covariance[21] = 1e6;
         odom.twist.covariance[28] = 1e6;
-        odom.twist.covariance[35] = 1e-9;
-      }
-      else{
-        odom.pose.covariance[0] = 1e-3;
-        odom.pose.covariance[7] = 1e-3;
-        odom.pose.covariance[8] = 0.0;
-        odom.pose.covariance[14] = 1e6;
-        odom.pose.covariance[21] = 1e6;
-        odom.pose.covariance[28] = 1e6;
-        odom.pose.covariance[35] = 1e3;
-        odom.twist.covariance[0] = 1e-3;
-        odom.twist.covariance[7] = 1e-3;
-        odom.twist.covariance[8] = 0.0;
-        odom.twist.covariance[14] = 1e6;
-        odom.twist.covariance[21] = 1e6;
-        odom.twist.covariance[28] = 1e6;
-        odom.twist.covariance[35] = 1e3;
-      }
+        odom.twist.covariance[35] = 0.5;
+      // // }
+      // // else{
+      //   odom.pose.covariance[0] = 1.0;
+      //   odom.pose.covariance[7] = 1.0;
+      //   odom.pose.covariance[14] = 1e-3;
+      //   odom.pose.covariance[21] = 0.1;
+      //   odom.pose.covariance[28] = 0.1;
+      //   odom.pose.covariance[35] = 0.1;
+      //   odom.twist.covariance[0] = 0.5;
+      //   odom.twist.covariance[7] = 1e6;
+      //   odom.twist.covariance[14] = 1e6;
+      //   odom.twist.covariance[21] = 1e6;
+      //   odom.twist.covariance[28] = 1e6;
+      //   odom.twist.covariance[35] = 0.1;
+      // }
 
       //publish the message
       odom_pub.publish(odom);
