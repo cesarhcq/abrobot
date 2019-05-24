@@ -37,19 +37,19 @@ geometry_msgs::Twist vel_ref;
 geometry_msgs::Vector3Stamped vel_encoder_robo;
 geometry_msgs::Point32 vel_kinematic_robo;
 
-//Right wheel
-int encoder0PinA_Right = 9;
-//int encoder0PinB_Right = 10;
-int encoderPinALast_Right= LOW;
-int encoder0Pos_Right = 1;
-float vel_Right = 0;
-
 //Left wheel
 int encoder0PinA_Left = 3;
 //int encoder0PinB_Left = 4;
 int encoderPinALast_Left = LOW;
 int encoder0Pos_Left = 1;
 float vel_Left = 0;
+
+//Right wheel
+int encoder0PinA_Right = 4;
+//int encoder0PinB_Right = 10;
+int encoderPinALast_Right= LOW;
+int encoder0Pos_Right = 1;
+float vel_Right = 0;
 
 //Position encoder Left
 int read_Left = LOW;
@@ -72,7 +72,7 @@ float epx_Right = 0;
 float epx_Left = 0;
 
 //ROS Function - Angular and linear Velocity Desired
-void velResp(const geometry_msgs::Twist& msg){
+void velRasp(const geometry_msgs::Twist& msg){
   
   //V - linear velocity disired
   vel_ref.linear.x = msg.linear.x;
@@ -90,7 +90,7 @@ void kinematic(){
 
 ros::NodeHandle  nh;
 //Subscribers
-ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &velResp);
+ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &velRasp);
 //Publisher
 ros::Publisher pub_encoder("/vel_encoder", &vel_encoder_robo);
 
@@ -106,6 +106,10 @@ void RosController_Wheel_Left() {
 
   //Tangential velocity measured by encoder sensor - Vel_Left
   read_Left = digitalRead(encoder0PinA_Left);
+
+  //Debug
+  //vel_encoder_robo.vector.z = read_Right;
+  
   if ((encoderPinALast_Left == LOW) && (read_Left == HIGH)) {
     // if (digitalRead(encoder0PinB_Left) == HIGH) {
       encoder0Pos_Left++;
@@ -120,7 +124,7 @@ void RosController_Wheel_Left() {
 
       //Mean of velocity in 30 interations
       cont_Left++;
-      if(cont_Left>30){
+      if(cont_Left>10){
         Sum_vel_Left = vel_Left;
         encoder0Pos_Left = 1;
         cont_Left = 0;
@@ -175,9 +179,6 @@ void RosController_Wheel_Left() {
       vel_encoder_robo.vector.x = vel_Left;
     }
 
-    //Degug-ROS
-    //vel_encoder_robo.y = u;
-
     //Output Motor Left
     ST.motor(2, Vl_gain);// vl
   }
@@ -194,8 +195,9 @@ void RosController_Wheel_Right() {
 
   //Tangential velocity measured by encoder sensor - Vel_Left
   read_Right = digitalRead(encoder0PinA_Right);
+  
   //Debug
-  //vel_encoder_robo.vector.y = read_Right;
+  //vel_encoder_robo.vector.x = read_Right;
 
   if ((encoderPinALast_Right == LOW) && (read_Right == HIGH)) {
     // if (digitalRead(encoder0PinB_Left) == HIGH) {
@@ -211,7 +213,7 @@ void RosController_Wheel_Right() {
 
       //Mean of velocity in 30 interations
       cont_Right++;
-      if(cont_Right>30){
+      if(cont_Right>10){
         Sum_vel_Right = vel_Right;
         encoder0Pos_Right = 1;
         cont_Right = 0;
@@ -263,13 +265,12 @@ void RosController_Wheel_Right() {
     }
 
     //Degug-ROS
-    //vel_encoder_robo.y = u;
+    //vel_encoder_robo.vector.x = Vl_gain;
 
     //Output Motor Left
-    ST.motor(1, Vl_gain);// vl
+    ST.motor(1, -Vl_gain);// vl
   }
 }
-
 
 // *********************************************
 
