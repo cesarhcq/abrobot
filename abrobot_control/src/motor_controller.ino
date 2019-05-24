@@ -109,7 +109,7 @@ void RosController_Wheel_Left() {
 
   //Debug
   //vel_encoder_robo.vector.z = read_Right;
-  
+
   if ((encoderPinALast_Left == LOW) && (read_Left == HIGH)) {
     // if (digitalRead(encoder0PinB_Left) == HIGH) {
       encoder0Pos_Left++;
@@ -161,7 +161,7 @@ void RosController_Wheel_Left() {
       epx_Left = 0;
       Vl_gain = 0;
       //Publisher Encoder Debug
-      vel_encoder_robo.header.stamp = nh.now();
+      //vel_encoder_robo.header.stamp = nh.now();
       vel_encoder_robo.vector.x = 0;
 
     }else if(w_left < 0){
@@ -169,15 +169,16 @@ void RosController_Wheel_Left() {
       //Speed saturation conversion
       Vl_gain = round((127 * u)/0.6);
       //Publisher Encoder Debug
-      vel_encoder_robo.header.stamp = nh.now();
+      //vel_encoder_robo.header.stamp = nh.now();
       vel_encoder_robo.vector.x = vel_Left*(-1);
     }else{
       //Speed saturation conversion
       Vl_gain = round((127 * u)/0.6);
       //Publisher Encoder Debug
-      vel_encoder_robo.header.stamp = nh.now();
+      //vel_encoder_robo.header.stamp = nh.now();
       vel_encoder_robo.vector.x = vel_Left;
     }
+    //vel_encoder_robo.header.stamp = nh.now();
 
     //Output Motor Left
     ST.motor(2, Vl_gain);// vl
@@ -295,6 +296,7 @@ void loop()
   kinematic();
   RosController_Wheel_Left();
   RosController_Wheel_Right();
+  vel_encoder_robo.header.stamp = nh.now();
   pub_encoder.publish(&vel_encoder_robo);
   delay(1);
 }

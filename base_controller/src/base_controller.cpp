@@ -89,18 +89,18 @@ int main(int argc, char** argv){
       geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(th);
 
       //first, we'll publish the transform over tf
-      // geometry_msgs::TransformStamped odom_trans;
-      // odom_trans.header.stamp = current_time;
-      // odom_trans.header.frame_id = "odom";
-      // odom_trans.child_frame_id = "base_link";
+      geometry_msgs::TransformStamped odom_trans;
+      odom_trans.header.stamp = current_time;
+      odom_trans.header.frame_id = "odom";
+      odom_trans.child_frame_id = "base_link";
 
-      // odom_trans.transform.translation.x = x;
-      // odom_trans.transform.translation.y = y;
-      // odom_trans.transform.translation.z = 0.0;
-      // odom_trans.transform.rotation = odom_quat;
+      odom_trans.transform.translation.x = x;
+      odom_trans.transform.translation.y = y;
+      odom_trans.transform.translation.z = 0.0;
+      odom_trans.transform.rotation = odom_quat;
 
-      // //send the transform
-      // odom_broadcaster.sendTransform(odom_trans);
+      //send the transform
+      odom_broadcaster.sendTransform(odom_trans);
 
       //next, we'll publish the odometry message over ROS
       nav_msgs::Odometry odom;
