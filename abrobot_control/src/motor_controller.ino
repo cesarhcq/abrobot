@@ -142,9 +142,9 @@ void RosController_Wheel_Left() {
   //V_linear controll erro = (cinematica - encoder)
   float erro = abs(w_left) - Media_Vl_encoder;
   //Proportional gain
-  float kp = 0.4;
+  float kp = 0.7;
   //Integrative Gain
-  float ki = 0.0008;
+  float ki = 0.005;
 
   if (abs(erro) > 0.01) {
     //PID control
@@ -192,7 +192,7 @@ void RosController_Wheel_Right() {
   float w_right = vel_kinematic_robo.y;
 
   //Debug kinematic
-  //vel_encoder_robo.vector.z = w_right;// - (w_right*0.004);
+  vel_encoder_robo.vector.z = w_right;// - (w_right*0.004);
 
   //Tangential velocity measured by encoder sensor - Vel_Left
   read_Right = digitalRead(encoder0PinA_Right);
@@ -231,9 +231,9 @@ void RosController_Wheel_Right() {
   //V_linear controll erro = (cinematica - encoder)
   float erro = abs(w_right) - Media_Vr_encoder;
   //Proportional gain
-  float kp = 0.4;
+  float kp = 0.7;
   //Integrative Gain
-  float ki = 0.0008;
+  float ki = 0.005;
 
   if (abs(erro) > 0.01) {
     //PID control
