@@ -50,6 +50,10 @@ double Sum_vel_Left = 0;
 double Media_Vl_encoder = 0;
 int cont_Left = 1;
 
+double Sum_vel_Right = 0;
+double Media_Vr_encoder = 0;
+int cont_Right = 1;
+
 //Left wheel encoder
 volatile long encoder0Pos_Left = 0;
 long encoder0PosAnt_Left = 0;
@@ -100,11 +104,15 @@ void setup()
   PWM_val1 = 0;
   PWM_val2 = 0;
 
-
   // filter mean
   Sum_vel_Left = 0;
   Media_Vl_encoder = 0;
   cont_Left = 1;
+
+  // filter mean
+  Sum_vel_Right = 0;
+  Media_Vr_encoder = 0;
+  cont_Right = 1;
 
   // ROS Initialization with Publishers and Subscribers 
   nh.initNode();
@@ -148,18 +156,28 @@ void getMotorData(unsigned long time)  {
   // vel_act1 = encoder0Pos_Left;
   // vel_act2 = encoder0Pos_Right;
   vel_act1 = double((encoder0Pos_Left-encoder0PosAnt_Left)*w*R)/double(dt);
-  vel_act2 = double((encoder0Pos_Right-encoder0PosAnt_Right)*w*R)/double(dt);
+  vel_act2 = double((encoder0Pos_Right-encoder0PosAnt_Right)*w*R)/double(dt) - (double((encoder0Pos_Right-encoder0PosAnt_Right)*w*R)/double(dt))*0.75;
   encoder0PosAnt_Left = encoder0Pos_Left;
   encoder0PosAnt_Right = encoder0Pos_Right;
 
   Sum_vel_Left = Sum_vel_Left + vel_act1;
   Media_Vl_encoder = Sum_vel_Left / cont_Left;
 
-  //Mean of velocity in 20 interations
+  //Mean of velocity in 10 interations
   cont_Left++;
-  if(cont_Left>20){
+  if(cont_Left>7){
     Sum_vel_Left = 0;
     cont_Left = 1;
+  }
+
+  Sum_vel_Right = Sum_vel_Right + vel_act2;
+  Media_Vr_encoder = Sum_vel_Right / cont_Right;
+
+  //Mean of velocity in 10 interations
+  cont_Right++;
+  if(cont_Right>7){
+    Sum_vel_Right = 0;
+    cont_Right = 1;
   }
 
 }
@@ -168,7 +186,7 @@ void publishVEL(unsigned long time) {
   vel_encoder_msg.header.stamp = nh.now();
   vel_encoder_msg.header.frame_id = encoder;
   vel_encoder_msg.vector.x = Media_Vl_encoder;
-  vel_encoder_msg.vector.y = vel_act2;
+  vel_encoder_msg.vector.y = Media_Vr_encoder;
   //vel_encoder_msg.vector.z = double(time)/1000;
   vel_encoder_msg.vector.z = vel_req1;
   pub_encoder.publish(&vel_encoder_msg);
