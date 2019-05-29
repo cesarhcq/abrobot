@@ -155,13 +155,20 @@ void getMotorData(unsigned long time)  {
   double w = (encoder_pulse * PI / 180);
   // vel_act1 = encoder0Pos_Left;
   // vel_act2 = encoder0Pos_Right;
-  vel_act1 = double((encoder0Pos_Left-encoder0PosAnt_Left)*w*R)/double(dt);
-  vel_act2 = double((encoder0Pos_Right-encoder0PosAnt_Right)*w*R)/double(dt) - (double((encoder0Pos_Right-encoder0PosAnt_Right)*w*R)/double(dt))*0.75;
+  double vel_left = double((encoder0Pos_Left-encoder0PosAnt_Left)*w*R)/double(dt);
+  double vel_right = double((encoder0Pos_Right-encoder0PosAnt_Right)*w*R)/double(dt) - (double((encoder0Pos_Right-encoder0PosAnt_Right)*w*R)/double(dt))*0.75;
   encoder0PosAnt_Left = encoder0Pos_Left;
   encoder0PosAnt_Right = encoder0Pos_Right;
 
-  Sum_vel_Left = Sum_vel_Left + vel_act1;
-  Media_Vl_encoder = Sum_vel_Left / cont_Left;
+  vel_act1 = filterLeft(vel_left);
+  vel_act2 = filterLeft(vel_right);
+
+}
+
+double filterLeft(double vel_left)  {
+
+  Sum_vel_Left = Sum_vel_Left + vel_left;
+  double Media = Sum_vel_Left / cont_Left;
 
   //Mean of velocity in 10 interations
   cont_Left++;
@@ -170,23 +177,29 @@ void getMotorData(unsigned long time)  {
     cont_Left = 1;
   }
 
-  Sum_vel_Right = Sum_vel_Right + vel_act2;
-  Media_Vr_encoder = Sum_vel_Right / cont_Right;
+  return Media;
+}
+
+double filterRight(double vel_right)  {
+
+  Sum_vel_Left = Sum_vel_Left + vel_right;
+  double Media = Sum_vel_Left / cont_Left;
 
   //Mean of velocity in 10 interations
-  cont_Right++;
-  if(cont_Right>7){
-    Sum_vel_Right = 0;
-    cont_Right = 1;
+  cont_Left++;
+  if(cont_Left>7){
+    Sum_vel_Left = 0;
+    cont_Left = 1;
   }
 
+  return Media;
 }
 
 void publishVEL(unsigned long time) {
   vel_encoder_msg.header.stamp = nh.now();
   vel_encoder_msg.header.frame_id = encoder;
-  vel_encoder_msg.vector.x = Media_Vl_encoder;
-  vel_encoder_msg.vector.y = Media_Vr_encoder;
+  vel_encoder_msg.vector.x = vel_act1;
+  vel_encoder_msg.vector.y = vel_act2;
   //vel_encoder_msg.vector.z = double(time)/1000;
   vel_encoder_msg.vector.z = vel_req1;
   pub_encoder.publish(&vel_encoder_msg);
