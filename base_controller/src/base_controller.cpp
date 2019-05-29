@@ -22,7 +22,7 @@ void handle_vel_encoder(const geometry_msgs::Vector3Stamped& encoder) {
   encoder_right = encoder.vector.x;
   encoder_time = encoder.header.stamp;
 
-  //ROS_INFO("encoder_left %lf - encoder_right %lf", encoder.vector.x, encoder.vector.y);
+  ROS_INFO("encoder_left %lf - encoder_right %lf", encoder.vector.x, encoder.vector.y);
 }
 
 // Robot Differential Drive Reverse Kinematic
