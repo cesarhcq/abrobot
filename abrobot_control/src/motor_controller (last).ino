@@ -16,12 +16,13 @@
 //
 // If you want to use a pin other than TX->1, see the SoftwareSerial example.
 
+#define LOOPTIME        200   // PID loop time(ms)
+#define encoder0PinA_Left 2   // encoder A pin Left
+#define encoder0PinA_Right 3  // encoder A pin Right
+#define MOTOR_LEFT 2   // motor pin Left
+#define MOTOR_RIGHT 1  // motor pin Right
 
-#define USBCON // RX and TX Arduino Leonardo - Sabertooth
-#define USE_USBCON // ROS Arduino Leonardo
-#define L 0.5 // distance between axes
-#define R 0.0775 // wheel radius 
-
+#include "robot_specs.h"
 #include <ArduinoHardware.h>
 #include <ros.h>
 #include <ros/time.h>
@@ -33,272 +34,55 @@
 
 SabertoothSimplified ST;
 
-geometry_msgs::Twist vel_ref;
-geometry_msgs::Vector3Stamped vel_encoder_robo;
-geometry_msgs::Point32 vel_kinematic_robo;
-
 char encoder[] = "/encoder";
+unsigned long lastMilli = 0;       // loop timing
+double vel_req1 = 0;
+double vel_req2 = 0;
+double vel_act1 = 0;
+double vel_act2 = 0;
+int PWM_val1 = 0;
+int PWM_val2 = 0;
+float Kp =   0.5;
+float Kd =   0;
+float Ki =   0;
 
-//Left wheel
-int encoder0PinA_Left = 3;
-//int encoder0PinB_Left = 4;
-int encoderPinALast_Left = LOW;
-int encoder0Pos_Left = 0;
-float vel_Left = 0;
-
-//Right wheel
-int encoder0PinA_Right = 4;
-//int encoder0PinB_Right = 10;
-int encoderPinALast_Right= LOW;
-int encoder0Pos_Right = 1;
-float vel_Right = 0;
-
-//Position encoder Left
-int read_Left = LOW;
-//float Delta_t_Left = 0;
-float Sum_t_Left = 0;
-float Sum_vel_Left = 0;
-float PreviusMillis_Left = 0;
+double Sum_vel_Left = 0;
 int cont_Left = 1;
 
-//Position encoder Right
-int read_Right = LOW;
-float Delta_t_Right = 0;
-float Sum_t_Right = 0;
-float Sum_vel_Right = 0;
-float PreviusMillis_Right = 0;
-int cont_Right = 0;
+double Sum_vel_Right = 0;
+int cont_Right = 1;
 
-//Controller variable
-float epx_Right = 0;
-float epx_Left = 0;
+//Left wheel encoder
+volatile long encoder0Pos_Left = 0;
+long encoder0PosAnt_Left = 0;
 
-int count_iterations = 100;
-int i = 0;
+//Right wheel encoder
+volatile long encoder0Pos_Right = 0;
+long encoder0PosAnt_Right = 0;
 
-double PreviusMillis = 0;
 
 //ROS Function - Angular and linear Velocity Desired
-void velRasp(const geometry_msgs::Twist& msg){
+void handle_cmd(const geometry_msgs::Twist& msg){
   
   //V - linear velocity disired
-  vel_ref.linear.x = msg.linear.x;
+  double x = msg.linear.x;
 
   //W - angular velocity disired
-  vel_ref.angular.z = msg.angular.z;
-}
+  double z = msg.angular.z;
 
-// Robot Differential Drive Kinematic
-void kinematic(){
-
-  vel_kinematic_robo.x = ( (2*vel_ref.linear.x) - (vel_ref.angular.z*L) )/2;  // Left wheel
-  vel_kinematic_robo.y = ( (2*vel_ref.linear.x) + (vel_ref.angular.z*L) )/2;  // Right wheel
-}
-
-ros::NodeHandle  nh;
-//Subscribers
-ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &velRasp);
-//Publisher
-ros::Publisher pub_encoder("/vel_encoder", &vel_encoder_robo);
-
-//int count_left=0, count_right=0;
-void getEncoderCount(){
-  if ((encoderPinALast_Left == LOW) && (read_Left == HIGH)) {
-    encoder0Pos_Left++;
-  }
-
-  if ((encoderPinALast_Right == LOW) && (read_Right == HIGH)) {
-    encoder0Pos_Right++;
-  }
+  // Robot Differential Drive Kinematic
+  vel_req1 = ( (2*x) - (z*L) )/2;  // Left wheel
+  vel_req2 = ( (2*x) + (z*L) )/2;  // Right wheel
 }
 
 // *********************************************
-//Left wheel control
-void RosController_Wheel_Left() {
 
-  //Call reference speed from kinematic
-  float w_left = vel_kinematic_robo.x;// + (vel_kinematic_robo.x*0.0672);
-
-  // Debug kinematic
-  vel_encoder_robo.vector.z = w_left;
-
-  // Tangential velocity measured by encoder sensor - Vel_Left
-  double Delta_t_Left = (millis() - PreviusMillis_Left) * 0.001;
-  PreviusMillis_Left = millis();
-
-  //Linear speed with respect to Theta = 10 degrees (encoder sensitivity) of wheel displacement of R = 7.5 cm radius.
-  double w = (10 * PI / 180) / (Delta_t_Left);
-  vel_Left = encoder0Pos_Left*w*R; // Count of pin_Left encoder0Pos_Left;
-
-  Sum_vel_Left = Sum_vel_Left + vel_Left;
-
-  //Average speed of a wheel V_linear
-  float Media_Vl_encoder = Sum_vel_Left / cont_Left;
-
-  //Mean of velocity in 20 interations
-  cont_Left++;
-  if(cont_Left>20){
-    Sum_vel_Left = vel_Left;
-    cont_Left = 1;
-  }
-
-  //DEBUG
-  vel_encoder_robo.vector.x = Media_Vl_encoder;
-  vel_encoder_robo.vector.y = vel_Left;
-
-
-  float Vl_gain;
-
-  //V_linear controll erro = (cinematica - encoder)
-  float erro = abs(w_left) - Media_Vl_encoder;
-  //Proportional gain
-  float kp = 0.7;
-  //Integrative Gain
-  float ki = 0.007;
-
-  //if (abs(erro) > 0.001) {
-    //PID control
-    float u = (erro * kp) + ((erro + epx_Left) * ki);
-    //Integrator Cumulative Error
-    epx_Left = epx_Left + erro;
-
-    //Change the sinal of controll
-    if(w_left == 0){
-      //Reset commands
-      Media_Vl_encoder = 0;
-      encoder0Pos_Left = 0;
-      Sum_vel_Left = 0;
-      epx_Left = 0;
-      Vl_gain = 0;
-      //Publisher Encoder Debug
-      vel_encoder_robo.vector.x = 0;
-
-    }else if(w_left < 0){
-      u = u*(-1);
-      //Speed saturation conversion
-      Vl_gain = round((127 * u)/0.6);
-
-      //Publisher Encoder Debug
-      //vel_encoder_robo.vector.x = vel_Left*(-1);
-    }else{
-      //Speed saturation conversion
-      Vl_gain = round((127 * u)/0.6);
-      //Publisher Encoder Debug
-      //vel_encoder_robo.header.stamp = nh.now();
-
-      // //Limitation of controller
-      // if(abs(Vl_gain > 127)){
-      //   Vl_gain = (u/abs(u))*127;
-      // }
-
-      //vel_encoder_robo.vector.y = vel_Left;
-    }
-    //vel_encoder_robo.header.stamp = nh.now();
-
-    //Output Motor Left
-    ST.motor(2, Vl_gain);// vl
-  //}
-}
-
-//Left wheel control
-void RosController_Wheel_Right() {
-
-  //Call reference speed from kinematic
-  float w_right = vel_kinematic_robo.y;
-
-  //Debug kinematic
-  vel_encoder_robo.vector.z = w_right;// - (w_right*0.004);
-
-  //Tangential velocity measured by encoder sensor - Vel_Left
-  read_Right = digitalRead(encoder0PinA_Right);
-  
-  //Debug
-  //vel_encoder_robo.vector.x = read_Right;
-
-  if ((encoderPinALast_Right == LOW) && (read_Right == HIGH)) {
-    // if (digitalRead(encoder0PinB_Left) == HIGH) {
-      encoder0Pos_Right++;
-      // Time between encoder signals
-      Delta_t_Right = (millis() - PreviusMillis_Right) * 0.001;
-      PreviusMillis_Right = millis();
-
-      //Linear speed with respect to Theta = 10 degrees (encoder sensitivity) of wheel displacement of R = 7.5 cm radius.
-      float w = (10 * PI / 180) / (Delta_t_Right);
-      vel_Right = w*R;
-      Sum_vel_Right = Sum_vel_Right + vel_Right;
-
-      //Mean of velocity in 30 interations
-      cont_Right++;
-      if(cont_Right>10){
-        Sum_vel_Right = vel_Right;
-        encoder0Pos_Right = 1;
-        cont_Right = 0;
-      }
-    //}
-  }
-
-  encoderPinALast_Right = read_Right;
-  //Average speed of a wheel V_linear
-  float Media_Vr_encoder = Sum_vel_Right / encoder0Pos_Right;
-
-  float Vl_gain;
-
-  //V_linear controll erro = (cinematica - encoder)
-  float erro = abs(w_right) - Media_Vr_encoder;
-  //Proportional gain
-  float kp = 0.7;
-  //Integrative Gain
-  float ki = 0.007;
-
-  if (abs(erro) > 0.001) {
-    //PID control
-    float u = (erro * kp) + ((erro + epx_Right) * ki);
-    //Integrator Cumulative Error
-    epx_Right = epx_Right + erro;
-
-    //Change the sinal of controll
-    if(w_right == 0){
-      //Reset commands
-      Media_Vr_encoder = 0;
-      encoder0Pos_Right = 1;
-      Sum_vel_Right = 0;
-      epx_Right = 0;
-      Vl_gain = 0;
-      //Publisher Encoder Debug
-      vel_encoder_robo.vector.y = 0;
-
-    }else if(w_right < 0){
-      u = u*(-1);
-      //Speed saturation conversion
-      Vl_gain = round((127 * u)/0.6);
-
-      //Limitation of controller
-      // if(abs(Vl_gain > 127)){
-      //   Vl_gain = (u/abs(u))*127;
-      // }
-
-      //Publisher Encoder Debug
-      vel_encoder_robo.vector.y = vel_Right*(-1);
-    }else{
-      //Speed saturation conversion
-      Vl_gain = round((127 * u)/0.6);
-
-      //Limitation of controller
-      // if(abs(Vl_gain > 127)){
-      //   Vl_gain = (u/abs(u))*127;
-      // }
-
-      //Publisher Encoder Debug
-      vel_encoder_robo.vector.y = vel_Right;
-    }
-
-    //Degug-ROS
-    //vel_encoder_robo.vector.x = Vl_gain;
-
-    //Output Motor Left
-    ST.motor(1, -Vl_gain);// vl
-  }
-}
+ros::NodeHandle  nh;
+//Subscribers
+ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &handle_cmd);
+//Publisher
+geometry_msgs::Vector3Stamped vel_encoder_msg;
+ros::Publisher pub_encoder("/vel_encoder", &vel_encoder_msg);
 
 // *********************************************
 
@@ -306,36 +90,120 @@ void setup()
 {
   SabertoothTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
   //Serial.begin(9600);
-  delay(5000);
-  pinMode (encoder0PinA_Left, INPUT);
-  pinMode (encoder0PinA_Right, INPUT);
-// ROS Initialization with Publishers and Subscribers 
+  delay(3000);
+  encoder0Pos_Left = 0;
+  encoder0Pos_Right = 0;
+  encoder0PosAnt_Left = 0;
+  encoder0PosAnt_Right = 0;
+  vel_req1 = 0;
+  vel_req2 = 0;
+  vel_act1 = 0;
+  vel_act2 = 0;
+  PWM_val1 = 0;
+  PWM_val2 = 0;
+
+
+  // filter mean
+  Sum_vel_Left = 0;
+  cont_Left = 1;
+  Sum_vel_Right = 0;
+  cont_Right = 1;
+
+  // ROS Initialization with Publishers and Subscribers 
   nh.initNode();
   nh.subscribe(sub_rasp);
   nh.advertise(pub_encoder);
 
+  pinMode (encoder0PinA_Left, INPUT);
+  pinMode (encoder0PinA_Right, INPUT);
+  digitalWrite(encoder0PinA_Left, LOW);                // turn on pullup resistor
+  digitalWrite(encoder0PinA_Right, LOW);
+  attachInterrupt(1, encoder_Left, RISING); // encoder left
+  attachInterrupt(0, encoder_Right, RISING); // encoder right
+
 }
-
-
 
 void loop()
 {
   nh.spinOnce();
-  read_Left = digitalRead(encoder0PinA_Left);
-  //read_Right = digitalRead(encoder0PinA_Right);
-  getEncoderCount();
+  unsigned long time = millis();
+  if(time-lastMilli>= LOOPTIME){
+    getMotorData(time-lastMilli);
 
-  if((count_iterations) == 0){
-    kinematic();                                     
-    RosController_Wheel_Left();
-    //RosController_Wheel_Right();
-    vel_encoder_robo.header.stamp = nh.now();
-    vel_encoder_robo.header.frame_id = encoder;
-    pub_encoder.publish(&vel_encoder_robo);
-    count_iterations = 100;
-    encoder0Pos_Left = 1;
+
+    PWM_val1 = ((vel_req1*127)/(0.8));
+    PWM_val2 = ((vel_req2*127)/(0.8));
+
+    //Output Motor Left
+    ST.motor(MOTOR_LEFT, PWM_val1);// vl
+    //Output Motor Right
+    ST.motor(MOTOR_RIGHT, -PWM_val2);// vr
+
+    publishVEL(time-lastMilli);
+    lastMilli = time;
   }
-  count_iterations--;
-  encoderPinALast_Left = read_Left;
-  delay(1);
+
+}
+
+void getMotorData(unsigned long time)  {
+  double dt = time * 0.001;
+  double w = (encoder_pulse * PI / 180);
+  // vel_act1 = encoder0Pos_Left;
+  // vel_act2 = encoder0Pos_Right;
+  double vel_left = double((encoder0Pos_Left-encoder0PosAnt_Left)*w*R)/double(dt);
+  double vel_right = double((encoder0Pos_Right-encoder0PosAnt_Right)*w*R)/double(dt);
+  encoder0PosAnt_Left = encoder0Pos_Left;
+  encoder0PosAnt_Right = encoder0Pos_Right;
+
+  vel_act1 = filterLeft(vel_left);
+  vel_act2 = filterLeft(vel_right);
+
+}
+
+double filterLeft(double vel_left)  {
+
+  Sum_vel_Left = Sum_vel_Left + vel_left;
+  double Media = Sum_vel_Left / cont_Left;
+
+  //Mean of velocity in 10 interations
+  cont_Left++;
+  if(cont_Left>7){
+    Sum_vel_Left = 0;
+    cont_Left = 1;
+  }
+
+  return Media;
+}
+
+double filterRight(double vel_right)  {
+
+  Sum_vel_Left = Sum_vel_Left + vel_right;
+  double Media = Sum_vel_Left / cont_Left;
+
+  //Mean of velocity in 10 interations
+  cont_Left++;
+  if(cont_Left>7){
+    Sum_vel_Left = 0;
+    cont_Left = 1;
+  }
+
+  return Media;
+}
+
+void publishVEL(unsigned long time) {
+  vel_encoder_msg.header.stamp = nh.now();
+  vel_encoder_msg.header.frame_id = encoder;
+  vel_encoder_msg.vector.x = vel_act1;
+  //vel_encoder_msg.vector.y = vel_act2;
+  //vel_encoder_msg.vector.z = double(time)/1000;
+  vel_encoder_msg.vector.z = vel_req1;
+  pub_encoder.publish(&vel_encoder_msg);
+  nh.spinOnce();
+}
+
+void encoder_Left() {
+  encoder0Pos_Left++;
+}
+void encoder_Right() {
+  encoder0Pos_Right++;
 }

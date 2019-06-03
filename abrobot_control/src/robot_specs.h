@@ -3,7 +3,8 @@
 
 #define USBCON // RX and TX Arduino Leonardo - Sabertooth
 #define USE_USBCON // ROS Arduino Leonardo
-#define encoder_pulse 10 //Linear speed with respect to Theta = 10 degrees (encoder sensitivity) of wheel displacement of R = 7.5 cm radius.
+#define encoder_pulse_left 10 //Linear speed with respect to Theta = 10 degrees (encoder sensitivity) of wheel displacement of R = 7.5 cm radius.
+#define encoder_pulse_right 3
 #define L 0.5 // distance between axes m
 #define R 0.0775 // wheel radius m
 #define pi              3.1415926

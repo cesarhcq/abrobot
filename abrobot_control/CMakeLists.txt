@@ -9,6 +9,7 @@ project(abrobot_control)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
+  sensor_msgs.msg
   roscpp
   rospy
   std_msgs
