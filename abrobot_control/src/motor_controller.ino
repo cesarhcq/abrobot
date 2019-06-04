@@ -20,9 +20,11 @@
 #define encoder0PinA_Left 2   // encoder A pin Left
 #define encoder0PinA_Right 3  // encoder A pin Right
 #define encoder0PinB_Left 4   // encoder B pin Left
-#define encoder0PinB_Right A0   // encoder B pin Right
 #define MOTOR_LEFT 2          // motor pin Left
 #define MOTOR_RIGHT 1         // motor pin Right
+
+#define PWM_1 9         // motor pin Right
+#define PWM_2 10         // motor pin Right
 
 #include "robot_specs.h"
 #include <ArduinoHardware.h>
@@ -119,14 +121,19 @@ void setup()
   nh.subscribe(sub_rasp);
   nh.advertise(pub_encoder);
 
+  pinMode(PWM_1, INPUT);
+  pinMode(PWM_2, INPUT);
+
   pinMode (encoder0PinA_Left, INPUT);
   pinMode (encoder0PinB_Left, INPUT);
   pinMode (encoder0PinA_Right, INPUT);
-  pinMode (encoder0PinB_Right, INPUT);
+  pinMode (encoder0PinB1_Right, INPUT);
+  pinMode (encoder0PinB2_Right, INPUT);
+
   digitalWrite(encoder0PinA_Left, HIGH);                // turn on pullup resistor
   digitalWrite(encoder0PinB_Left, HIGH); 
   digitalWrite(encoder0PinA_Right, HIGH);
-  //analogWrite(encoder0PinB_Right, 0);
+
   attachInterrupt(1, encoder_Left, RISING); // encoder left
   attachInterrupt(0, encoder_Right, RISING); // encoder right
 
@@ -158,8 +165,6 @@ void getMotorData(unsigned long time)  {
   double dt = time * 0.001;
   double w1 = (encoder_pulse_left * PI / 180);
   double w2 = (encoder_pulse_right * PI / 180);
-  // vel_act1 = encoder0Pos_Left;
-  // vel_act2 = encoder0Pos_Right;
   double vel_left = (double((encoder0Pos_Left-encoder0PosAnt_Left)*w1*R)/double(dt));
   double vel_right = (double((encoder0Pos_Right-encoder0PosAnt_Right)*w2*R)/double(dt));
   encoder0PosAnt_Left = encoder0Pos_Left;
@@ -204,10 +209,8 @@ void publishVEL(unsigned long time) {
   vel_encoder_msg.header.frame_id = encoder;
   vel_encoder_msg.vector.x = vel_act1;
   vel_encoder_msg.vector.y = vel_act2;
+  vel_encoder_msg.vector.z = vel_req1;
   //vel_encoder_msg.vector.z = double(time)/1000;
-  // int val = analogRead(encoder0PinB_Right);
-  // val = map(val, 0, 1023, 0, 255);
-  vel_encoder_msg.vector.z = vel_req2;
   pub_encoder.publish(&vel_encoder_msg);
   nh.spinOnce();
 }
@@ -217,6 +220,8 @@ void encoder_Left() {
   else encoder0Pos_Left--;
 }
 void encoder_Right() {
-  if (vel_req2 >= 0) encoder0Pos_Right++;
+  int pwm_value_1 = pulseIn(PWM_1, HIGH);
+  int pwm_value_2 = pulseIn(PWM_2, HIGH);
+  if ((pwm_value_1 - pwm_value_2) > 0) encoder0Pos_Right++;
   else encoder0Pos_Right--;
 }

@@ -6,14 +6,21 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Vector3Stamped.h>
+#include <geometry_msgs/Vector3.h>
 
 double L = 0.5; // distance between axes
 double R = 0.0775; // wheel radius 
 
 double encoder_left = 0;
 double encoder_right = 0;
+double gyro_x = 0.0;
+double gyro_y = 0.0;
+double gyro_z = 0.0;
+
+
 double vx = 0;
 double vth = 0;
+
 ros::Time encoder_time;
 bool init = false;
 
@@ -23,6 +30,13 @@ void handle_vel_encoder(const geometry_msgs::Vector3Stamped& encoder) {
   encoder_time = encoder.header.stamp;
 
   ROS_INFO("encoder_left %lf - encoder_right %lf", encoder.vector.x, encoder.vector.y);
+}
+
+// Gyro Function from Smartphone
+void handle_gyro( const geometry_msgs::Vector3& gyro) {
+  gyro_x = gyro.x;
+  gyro_y = gyro.y;
+  gyro_z = gyro.z;
 }
 
 // Robot Differential Drive Reverse Kinematic
@@ -37,16 +51,36 @@ int main(int argc, char** argv){
   ros::init(argc, argv, "base_controller");
 
   ros::NodeHandle nh;
-  ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
+  ros::NodeHandle nh_private_("~");
+
+  ros::Subscriber gyro_sub = nh.subscribe("gyro", 50, handle_gyro);
   ros::Subscriber sub = nh.subscribe("/vel_encoder", 100, handle_vel_encoder);
-  
+  ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
+
   // Crete tf - base link and Odometry
   tf::TransformBroadcaster baselink_broadcaster;
   tf::TransformBroadcaster odom_broadcaster;
 
+  double linear_scale_positive = 1.0;
+  double linear_scale_negative = 1.0;
+  double angular_scale_positive = 1.0;
+  double angular_scale_negative = 1.0;
+  double alpha = 0.0;
+  double dth_odom = 0.0;
+  double dth_gyro = 0.0;
+  double dxy_ave = 0.0;
+  bool use_imu = false;
+
   double x = 0.0;
   double y = 0.0;
   double th = 0.0;
+
+  nh_private_.getParam("linear_scale_positive", linear_scale_positive);
+  nh_private_.getParam("linear_scale_negative", linear_scale_negative);
+  nh_private_.getParam("angular_scale_positive", angular_scale_positive);
+  nh_private_.getParam("angular_scale_negative", angular_scale_negative);
+  nh_private_.getParam("alpha", alpha);
+  nh_private_.getParam("use_imu", use_imu);
 
   ros::Time current_time, last_time;
   ros::Rate r(10.0);
