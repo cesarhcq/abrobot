@@ -46,9 +46,15 @@ double vel_act1 = 0;
 double vel_act2 = 0;
 int PWM_val1 = 0;
 int PWM_val2 = 0;
-float Kp =   0.5;
-float Kd =   0;
-float Ki =   0;
+
+double error = 0;
+double pidTerm = 0;
+double new_cmd = 0;
+
+// double last_error1 = 0;
+// double last_error2 = 0;
+// double int_error1 = 0;
+// double int_error2 = 0;
 
 double Sum_vel_Left = 0;
 double Media_Vl_encoder = 0;
@@ -127,8 +133,6 @@ void setup()
   pinMode (encoder0PinA_Left, INPUT);
   pinMode (encoder0PinB_Left, INPUT);
   pinMode (encoder0PinA_Right, INPUT);
-  pinMode (encoder0PinB1_Right, INPUT);
-  pinMode (encoder0PinB2_Right, INPUT);
 
   digitalWrite(encoder0PinA_Left, HIGH);                // turn on pullup resistor
   digitalWrite(encoder0PinB_Left, HIGH); 
@@ -146,9 +150,10 @@ void loop()
   if(time-lastMilli>= LOOPTIME){
     getMotorData(time-lastMilli);
 
+    PWM_val1 = updatePid(1, vel_req1, vel_act1);
 
-    PWM_val1 = ((vel_req1*127)/(0.8));
-    PWM_val2 = ((vel_req2*127)/(0.8));
+    //PWM_val1 = ((vel_req1*127)/(0.8));
+    //PWM_val2 = ((vel_req2*127)/(0.8));
 
     //Output Motor Left
     ST.motor(MOTOR_LEFT, PWM_val1);// vl
@@ -204,12 +209,46 @@ double filterRight(double vel_right)  {
   return Media;
 }
 
+// PID correction - Function
+
+int updatePid(int id, double targetValue, double currentValue) {
+  float Kp = 0.8;
+  float Kd = 0.0;
+  float Ki = 0.1;
+  static double last_error1 = 0;
+  static double last_error2 = 0;
+  static double int_error1 = 0;
+  static double int_error2 = 0;
+
+  // erro = kinetmatic - encoder
+  error = vel_req1-currentValue;
+  if (id == 1) {
+    
+    pidTerm = Kp*error + Ki*int_error1 + Kd*(error-last_error1);
+    int_error1 += error;
+    last_error1 = error;
+  }
+  else {
+    int_error2 += error;
+    pidTerm = Kp*error + Kd*(error-last_error2) + Ki*int_error2;
+    last_error2 = error;
+  }
+
+  new_cmd = constrain( ((pidTerm*127)/(0.8)) , -127, 127 );
+  //new_cmd = round((pidTerm*127)/(0.8));
+
+  //new_pwm = constrain(double(command)*MAX_RPM/4095.0 + pidTerm, -MAX_RPM, MAX_RPM);
+  //new_cmd = 4095.0*new_pwm/MAX_RPM;
+
+  return int(new_cmd);
+}
+
 void publishVEL(unsigned long time) {
   vel_encoder_msg.header.stamp = nh.now();
   vel_encoder_msg.header.frame_id = encoder;
-  vel_encoder_msg.vector.x = vel_act1;
-  vel_encoder_msg.vector.y = vel_act2;
-  vel_encoder_msg.vector.z = vel_req1;
+  vel_encoder_msg.vector.x = vel_act1; // encoder left
+  vel_encoder_msg.vector.y = pidTerm;  // pid rad/s
+  vel_encoder_msg.vector.z = vel_req1;  // pid volts
   //vel_encoder_msg.vector.z = double(time)/1000;
   pub_encoder.publish(&vel_encoder_msg);
   nh.spinOnce();
