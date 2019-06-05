@@ -9,16 +9,10 @@ project(abrobot_control)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-<<<<<<< HEAD
-  nav_msgs
-=======
->>>>>>> gunther_real
   sensor_msgs
   roscpp
   rospy
   std_msgs
-  roscpp
-  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -142,7 +136,6 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/abrobot_control_node.cpp)
-#add_executable(abrobot_control src/base_controller.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -158,7 +151,6 @@ include_directories(
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-#target_link_libraries(abrobot_control ${catkin_LIBRARIES})
 
 #############
 ## Install ##
