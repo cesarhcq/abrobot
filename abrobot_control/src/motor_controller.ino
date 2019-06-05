@@ -39,14 +39,14 @@ geometry_msgs::Point32 vel_kinematic_robo;
 
 //Right wheel
 int encoder0PinA_Right = 5;
-int encoder0PinB_Right = 6;
+//int encoder0PinB_Right = 6;
 int encoderPinALast_Right= LOW;
 int encoder0Pos_Right = 1;
 float vel_Right = 0;
 
 //Left wheel
 int encoder0PinA_Left = 3;
-int encoder0PinB_Left = 4;
+//int encoder0PinB_Left = 4;
 int encoderPinALast_Left = LOW;
 int encoder0Pos_Left = 1;
 float vel_Left = 0;
@@ -290,9 +290,9 @@ void setup()
   //Serial.begin(9600);
   delay(5000);
   pinMode (encoder0PinA_Right, INPUT);
-  pinMode (encoder0PinB_Right, INPUT);
+  //pinMode (encoder0PinB_Right, INPUT);
   pinMode (encoder0PinA_Left, INPUT);
-  pinMode (encoder0PinB_Left, INPUT);
+  //pinMode (encoder0PinB_Left, INPUT);
   
 // ROS Initialization with Publishers and Subscribers 
   nh.initNode();

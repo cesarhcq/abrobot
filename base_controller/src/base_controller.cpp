@@ -42,10 +42,6 @@ int main(int argc, char** argv){
   
   // // Crete tf - base link and Odometry
   tf::TransformBroadcaster baselink_broadcaster;
-  baselink_broadcaster.sendTransform(
-    tf::StampedTransform(
-      tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.1, 0.0, 0.2)),
-      ros::Time::now(),"base_link", "base_laser"));
   tf::TransformBroadcaster odom_broadcaster;
 
   double x = 0.0;
@@ -58,6 +54,11 @@ int main(int argc, char** argv){
   while(nh.ok()){
 
     ros::spinOnce(); // check for incoming messages
+
+    baselink_broadcaster.sendTransform(
+    tf::StampedTransform(
+      tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.1, 0.0, 0.2)),
+      ros::Time::now(),"base_link", "laser"));
 
     if(!init){
 
