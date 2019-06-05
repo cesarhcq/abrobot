@@ -16,15 +16,13 @@
   </node>
 
   <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-    <param name="host" value="192.168.42.185" />
+    <param name="host" value="192.168.42.4" />
     <param name="num_callibration_itrs" value="1" />
     <param name="debug" value="false" />
   </node>
 
-  <node name="base_controller_node" pkg="base_controller" type="base_controller"/>
-<!--     <param name="publish_tf" value="true" />
-    <param name="publish_rate" value="10.0" /> -->
-    <param name="alpha" value="1.0" />
+  <node name="base_controller_node" pkg="base_controller" type="base_controller">
+    <param name="alpha" value="0.0" />
     <param name="use_imu" value="true" />
   </node>
 
@@ -41,28 +39,27 @@
   <param name="max_particles" value="5000"/>
   <param name="kld_err" value="0.05"/>
   <param name="kld_z" value="0.99"/>
-  <param name="odom_alpha1" value="2.0"/>
+  <param name="odom_alpha1" value="0.1"/>
   <param name="odom_alpha2" value="0.2"/>
   <!-- translation std dev, m -->
-  <param name="odom_alpha3" value="0.8"/>
-  <param name="odom_alpha4" value="2.0"/>
+  <param name="odom_alpha3" value="0.1"/>
+  <param name="odom_alpha4" value="0.1"/>
   <param name="laser_z_hit" value="0.5"/>
   <param name="laser_z_short" value="0.05"/>
   <param name="laser_z_max" value="0.05"/>
   <param name="laser_z_rand" value="0.5"/>
   <param name="laser_sigma_hit" value="0.2"/>
   <param name="laser_lambda_short" value="0.1"/>
-  <param name="laser_lambda_short" value="0.1"/>
   <param name="laser_model_type" value="likelihood_field"/>
   <!-- <param name="laser_model_type" value="beam"/> -->
   <param name="laser_likelihood_max_dist" value="2.0"/>
   <param name="update_min_d" value="0.2"/>
-  <param name="update_min_a" value="0.5"/>
+  <param name="update_min_a" value="0.2"/>
   <param name="odom_frame_id" value="odom"/>
   <param name="resample_interval" value="1"/>
-  <param name="transform_tolerance" value="0.1"/>
-  <param name="recovery_alpha_slow" value="0.0"/>
-  <param name="recovery_alpha_fast" value="0.0"/>
+  <param name="transform_tolerance" value="1.0"/>
+  <param name="recovery_alpha_slow" value="0.001"/>
+  <param name="recovery_alpha_fast" value="0.1"/>
 </node>
 
 <!--   include file="$(find amcl)/examples/amcl_omni.launch"/
@@ -101,7 +98,7 @@
 
 
   <!-- Move base -->
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+<!--   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <rosparam file="$(find abrobot_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find abrobot_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find abrobot_navigation)/config/local_costmap_params.yaml" command="load" />
@@ -110,12 +107,22 @@
     
     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/> 
     <param name="base_global_planner" value="navfn/NavfnROS"/>
-   <!--  <remap from="cmd_vel" to="cmd_vel"/>
-    <remap from="odom" to="odom"/>
-    <remap from="scan" to="scan"/> -->
     <param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/>
     <param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/>
+  </node> -->
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find abrobot_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find abrobot_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find abrobot_navigation)/param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/navfn_global_planner_params.yaml" command="load" />
   </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find abrobot_navigation)/amcl_real_navigation.rviz" />
 
    <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
 

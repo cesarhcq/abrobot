@@ -10,7 +10,7 @@ from geometry_msgs.msg import Vector3
 from math import sqrt,atan2,cos,sin,pi
 
 def imu_publisher(sock):
-    host="192.168.42.45" #everytime changes according to restart UDP
+    host="192.168.42.180" #everytime changes according to restart UDP
     port=5555
     theta = 0
     gyro_x_offset = 0.0
@@ -19,8 +19,8 @@ def imu_publisher(sock):
     pub_freq = 10
     alpha = 0.9
     count = 0
-    num_callibration_itrs = 60
-    debug = False
+    num_callibration_itrs = 10
+    debug = True
 
     gyro_pub = rospy.Publisher('gyro', Vector3, queue_size=50)
     imu_pub = rospy.Publisher('imu', Imu, queue_size=50)

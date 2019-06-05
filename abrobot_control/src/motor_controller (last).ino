@@ -19,8 +19,12 @@
 #define LOOPTIME        200   // PID loop time(ms)
 #define encoder0PinA_Left 2   // encoder A pin Left
 #define encoder0PinA_Right 3  // encoder A pin Right
-#define MOTOR_LEFT 2   // motor pin Left
-#define MOTOR_RIGHT 1  // motor pin Right
+#define encoder0PinB_Left 4   // encoder B pin Left
+#define MOTOR_LEFT 2          // motor pin Left
+#define MOTOR_RIGHT 1         // motor pin Right
+
+#define PWM_1 9         // motor pin Right
+#define PWM_2 10         // motor pin Right
 
 #include "robot_specs.h"
 #include <ArduinoHardware.h>
@@ -42,14 +46,26 @@ double vel_act1 = 0;
 double vel_act2 = 0;
 int PWM_val1 = 0;
 int PWM_val2 = 0;
-float Kp =   0.5;
-float Kd =   0;
-float Ki =   0;
+float Kp =   0.8;
+float Kd =   0.0;
+float Ki =   0.08;
+
+double error = 0;
+double pidTerm = 0;
+double new_cmd = 0;
+double epx_Right = 0;
+
+double last_error1 = 0;
+double last_error2 = 0;
+double int_error1 = 0;
+double int_error2 = 0;
 
 double Sum_vel_Left = 0;
+double Media_Vl_encoder = 0;
 int cont_Left = 1;
 
 double Sum_vel_Right = 0;
+double Media_Vr_encoder = 0;
 int cont_Right = 1;
 
 //Left wheel encoder
@@ -102,10 +118,11 @@ void setup()
   PWM_val1 = 0;
   PWM_val2 = 0;
 
-
   // filter mean
   Sum_vel_Left = 0;
   cont_Left = 1;
+
+  // filter mean
   Sum_vel_Right = 0;
   cont_Right = 1;
 
@@ -114,10 +131,17 @@ void setup()
   nh.subscribe(sub_rasp);
   nh.advertise(pub_encoder);
 
+  pinMode(PWM_1, INPUT);
+  pinMode(PWM_2, INPUT);
+
   pinMode (encoder0PinA_Left, INPUT);
+  pinMode (encoder0PinB_Left, INPUT);
   pinMode (encoder0PinA_Right, INPUT);
-  digitalWrite(encoder0PinA_Left, LOW);                // turn on pullup resistor
-  digitalWrite(encoder0PinA_Right, LOW);
+
+  digitalWrite(encoder0PinA_Left, HIGH);                // turn on pullup resistor
+  digitalWrite(encoder0PinB_Left, HIGH); 
+  digitalWrite(encoder0PinA_Right, HIGH);
+
   attachInterrupt(1, encoder_Left, RISING); // encoder left
   attachInterrupt(0, encoder_Right, RISING); // encoder right
 
@@ -130,9 +154,20 @@ void loop()
   if(time-lastMilli>= LOOPTIME){
     getMotorData(time-lastMilli);
 
+    //PWM_val1 = updatePid(1, vel_req1, vel_act1);
 
-    PWM_val1 = ((vel_req1*127)/(0.8));
-    PWM_val2 = ((vel_req2*127)/(0.8));
+    //PWM_val1 = ((vel_req1*127)/(0.8));
+    //PWM_val2 = ((vel_req2*127)/(0.8));
+
+    error = vel_req1-vel_act1;
+    pidTerm = (error * Kp) + ((error + epx_Right) * Ki);
+    //Integrator Cumulative Error
+    epx_Right = epx_Right + error;
+    //new_cmd = constrain( ((pidTerm*127)/(0.8)) , -127, 127 );
+    PWM_val1 = round((pidTerm*127)/(0.8));
+
+
+
 
     //Output Motor Left
     ST.motor(MOTOR_LEFT, PWM_val1);// vl
@@ -147,17 +182,15 @@ void loop()
 
 void getMotorData(unsigned long time)  {
   double dt = time * 0.001;
-  double w = (encoder_pulse * PI / 180);
-  // vel_act1 = encoder0Pos_Left;
-  // vel_act2 = encoder0Pos_Right;
-  double vel_left = double((encoder0Pos_Left-encoder0PosAnt_Left)*w*R)/double(dt);
-  double vel_right = double((encoder0Pos_Right-encoder0PosAnt_Right)*w*R)/double(dt);
+  double w1 = (encoder_pulse_left * PI / 180);
+  double w2 = (encoder_pulse_right * PI / 180);
+  double vel_left = (double((encoder0Pos_Left-encoder0PosAnt_Left)*w1*R)/double(dt));
+  double vel_right = (double((encoder0Pos_Right-encoder0PosAnt_Right)*w2*R)/double(dt));
   encoder0PosAnt_Left = encoder0Pos_Left;
   encoder0PosAnt_Right = encoder0Pos_Right;
 
   vel_act1 = filterLeft(vel_left);
-  vel_act2 = filterLeft(vel_right);
-
+  vel_act2 = filterRight(vel_right);
 }
 
 double filterLeft(double vel_left)  {
@@ -177,33 +210,59 @@ double filterLeft(double vel_left)  {
 
 double filterRight(double vel_right)  {
 
-  Sum_vel_Left = Sum_vel_Left + vel_right;
-  double Media = Sum_vel_Left / cont_Left;
+  Sum_vel_Right = Sum_vel_Right + vel_right;
+  double Media = Sum_vel_Right / cont_Right;
 
   //Mean of velocity in 10 interations
-  cont_Left++;
-  if(cont_Left>7){
-    Sum_vel_Left = 0;
-    cont_Left = 1;
+  cont_Right++;
+  if(cont_Right>7){
+    Sum_vel_Right = 0;
+    cont_Right = 1;
   }
 
   return Media;
 }
 
+// PID correction - Function
+
+int updatePid(int id, double targetValue, double currentValue) {
+
+  // erro = kinetmatic - encoder
+  error = vel_req1-currentValue;
+
+  pidTerm = (error * Kp) + ((error + epx_Right) * Ki);
+  //Integrator Cumulative Error
+  epx_Right = epx_Right + error;
+
+
+
+  //new_cmd = constrain( ((pidTerm*127)/(0.8)) , -127, 127 );
+  new_cmd = round((pidTerm*127)/(0.8));
+
+  //new_pwm = constrain(double(command)*MAX_RPM/4095.0 + pidTerm, -MAX_RPM, MAX_RPM);
+  //new_cmd = 4095.0*new_pwm/MAX_RPM;
+
+  return int(new_cmd);
+}
+
 void publishVEL(unsigned long time) {
   vel_encoder_msg.header.stamp = nh.now();
   vel_encoder_msg.header.frame_id = encoder;
-  vel_encoder_msg.vector.x = vel_act1;
-  //vel_encoder_msg.vector.y = vel_act2;
+  vel_encoder_msg.vector.x = vel_act1; // encoder left
+  vel_encoder_msg.vector.y = pidTerm;  // pid rad/s
+  vel_encoder_msg.vector.z = vel_req1;  // reference
   //vel_encoder_msg.vector.z = double(time)/1000;
-  vel_encoder_msg.vector.z = vel_req1;
   pub_encoder.publish(&vel_encoder_msg);
   nh.spinOnce();
 }
 
 void encoder_Left() {
-  encoder0Pos_Left++;
+  if (digitalRead(encoder0PinA_Left) == digitalRead(encoder0PinB_Left)) encoder0Pos_Left++;
+  else encoder0Pos_Left--;
 }
 void encoder_Right() {
-  encoder0Pos_Right++;
+  int pwm_value_1 = pulseIn(PWM_1, HIGH);
+  int pwm_value_2 = pulseIn(PWM_2, HIGH);
+  if ((pwm_value_1 - pwm_value_2) > 0) encoder0Pos_Right++;
+  else encoder0Pos_Right--;
 }

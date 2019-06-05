@@ -38,6 +38,8 @@ void handle_gyro( const geometry_msgs::Vector3& gyro) {
   gyro_x = gyro.x;
   gyro_y = gyro.y;
   gyro_z = gyro.z;
+
+  //ROS_INFO("gyro_z: %lf ", gyro_z);
 }
 
 // Robot Differential Drive Reverse Kinematic
@@ -62,7 +64,7 @@ int main(int argc, char** argv){
   tf::TransformBroadcaster odom_broadcaster;
 
   double alpha = 0.0;
-  bool use_imu = false;
+  bool use_imu = true;
   double vx = 0.0;
   double vth = 0.0;
   double dth = 0.0;
@@ -98,8 +100,8 @@ int main(int argc, char** argv){
       reverse_kinematics(); // return v_encoder and dth_encoder
       current_time = encoder_time;
       //compute odometry in a typical way given the velocities of the robot
-      //double dt = (current_time - last_time).toSec();
-      double dt = encoder_dt;
+      double dt = (current_time - last_time).toSec();
+      //double dt = encoder_dt;
 
       if(use_imu) {
         dth = alpha*dth_encoder + (1-alpha)*gyro_z;
@@ -112,13 +114,14 @@ int main(int argc, char** argv){
       double delta_y = ( v_encoder * sin(th) ) * dt;
       double delta_th = dth * dt;
 
-      ROS_INFO("DEBUG - delta_x %lf - delta_y %lf - time: %lf", delta_x, delta_y, dt);
+      //ROS_INFO("DEBUG - delta_x %lf - delta_y %lf - time: %lf", delta_x, delta_y, dt);
 
       // position and orientation
       x += delta_x;
       y += delta_y;
       th += delta_th;
 
+      //ROS_INFO("DEBUG - x %lf - y %lf - dth: %lf - dt: %lf", x, y, delta_th, dt);
       //ROS_INFO("encoder_left %lf - encoder_right %lf - time: %lf", encoder_left, encoder_right, dt);
       //ROS_INFO("DEBUG - v_encoder %lf - dth_encoder %lf", v_encoder, dth);
 

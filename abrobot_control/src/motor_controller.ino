@@ -48,6 +48,8 @@ int PWM_val1 = 0;
 int PWM_val2 = 0;
 
 double pidTerm = 0;
+double new_pwm = 0;
+double new_cmd = 0;
 
 double Sum_vel_Left = 0;
 int cont_Left = 1;
@@ -202,7 +204,7 @@ double filterRight(double vel_right)  {
 int updatePid(int idMotor, double referenceValue, double encoderValue) {
   float Kp = 0.8;
   float Kd = 0.0;
-  float Ki = 0.1;
+  float Ki = 0.2;
   static double last_error1 = 0;
   static double last_error2 = 0;
   static double int_error1 = 0;
@@ -222,14 +224,19 @@ int updatePid(int idMotor, double referenceValue, double encoderValue) {
     last_error2 = error;
   }
 
-  // if(encoderValue == 0){
-  //   last_error1 = 0;
-  //   last_error2 = 0;
-  //   int_error1 = 0;
-  //   int_error2 = 0;
-  // }
+  if(referenceValue == 0){
+    last_error1 = 0;
+    last_error2 = 0;
+    int_error1 = 0;
+    int_error2 = 0;
+    pidTerm = 0;
+  }
 
-  double new_cmd = constrain( ((pidTerm*127)/(0.8)) , -127, 127 );
+  double constrainMotor = abs(referenceValue)*1.1;
+
+  new_pwm = constrain( ((pidTerm*127)/(0.8)) , -((constrainMotor*127)/(0.8)), ((constrainMotor*127)/(0.8)) );
+  new_cmd = constrain( new_pwm , -127, 127 );
+
   return int(new_cmd);
 }
 
