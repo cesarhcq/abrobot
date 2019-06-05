@@ -10,13 +10,23 @@
  <!--  <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster"
       args="0 0 0 0 0 0 map odom 100"/> -->
 
-  <node pkg="rosserial_python" type="serial_node.py" name="arduino_controller" output= "screen">
+  <node name="arduino_controller" pkg="rosserial_python" type="serial_node.py" output= "screen">
         <param name="port" value="/dev/ttyACM0"/>  
         <param name="baud" value="57600"/>
   </node>
 
+  <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
+    <param name="host" value="192.168.42.185" />
+    <param name="num_callibration_itrs" value="1" />
+    <param name="debug" value="false" />
+  </node>
 
-  <node pkg="base_controller" type="base_controller" name="base_controller"/>
+  <node name="base_controller_node" pkg="base_controller" type="base_controller"/>
+<!--     <param name="publish_tf" value="true" />
+    <param name="publish_rate" value="10.0" /> -->
+    <param name="alpha" value="1.0" />
+    <param name="use_imu" value="true" />
+  </node>
 
   <!-- Localization -->
 
@@ -105,10 +115,9 @@
     <remap from="scan" to="scan"/> -->
     <param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/>
     <param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/>
-
-
-
   </node>
+
+   <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
 
 
 </launch>

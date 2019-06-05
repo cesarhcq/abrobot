@@ -26,6 +26,7 @@ def imu_publisher(sock):
     imu_pub = rospy.Publisher('imu', Imu, queue_size=50)
     rospy.init_node('imu_publisher', anonymous=True)
     rate = rospy.Rate(pub_freq)
+    
     if rospy.has_param('~num_callibration_itrs'):
         num_callibration_itrs = rospy.get_param('~num_callibration_itrs')
     if rospy.has_param('~host'):
