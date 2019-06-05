@@ -47,21 +47,12 @@ double vel_act2 = 0;
 int PWM_val1 = 0;
 int PWM_val2 = 0;
 
-double error = 0;
 double pidTerm = 0;
-double new_cmd = 0;
-
-// double last_error1 = 0;
-// double last_error2 = 0;
-// double int_error1 = 0;
-// double int_error2 = 0;
 
 double Sum_vel_Left = 0;
-double Media_Vl_encoder = 0;
 int cont_Left = 1;
 
 double Sum_vel_Right = 0;
-double Media_Vr_encoder = 0;
 int cont_Right = 1;
 
 //Left wheel encoder
@@ -88,7 +79,6 @@ void handle_cmd(const geometry_msgs::Twist& msg){
 }
 
 // *********************************************
-
 ros::NodeHandle  nh;
 //Subscribers
 ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &handle_cmd);
@@ -102,7 +92,7 @@ void setup()
 {
   SabertoothTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
   //Serial.begin(9600);
-  delay(3000);
+  delay(1000);
   encoder0Pos_Left = 0;
   encoder0Pos_Right = 0;
   encoder0PosAnt_Left = 0;
@@ -150,10 +140,8 @@ void loop()
   if(time-lastMilli>= LOOPTIME){
     getMotorData(time-lastMilli);
 
-    PWM_val1 = updatePid(1, vel_req1, vel_act1);
-
-    //PWM_val1 = ((vel_req1*127)/(0.8));
-    //PWM_val2 = ((vel_req2*127)/(0.8));
+    PWM_val1 = updatePid(MOTOR_LEFT, vel_req1, vel_act1);
+    PWM_val2 = updatePid(MOTOR_RIGHT, vel_req2, vel_act2);
 
     //Output Motor Left
     ST.motor(MOTOR_LEFT, PWM_val1);// vl
@@ -182,7 +170,7 @@ void getMotorData(unsigned long time)  {
 double filterLeft(double vel_left)  {
 
   Sum_vel_Left = Sum_vel_Left + vel_left;
-  double Media = Sum_vel_Left / cont_Left;
+  double filter = Sum_vel_Left / cont_Left;
 
   //Mean of velocity in 10 interations
   cont_Left++;
@@ -191,13 +179,13 @@ double filterLeft(double vel_left)  {
     cont_Left = 1;
   }
 
-  return Media;
+  return filter;
 }
 
 double filterRight(double vel_right)  {
 
   Sum_vel_Right = Sum_vel_Right + vel_right;
-  double Media = Sum_vel_Right / cont_Right;
+  double filter = Sum_vel_Right / cont_Right;
 
   //Mean of velocity in 10 interations
   cont_Right++;
@@ -206,12 +194,12 @@ double filterRight(double vel_right)  {
     cont_Right = 1;
   }
 
-  return Media;
+  return filter;
 }
 
 // PID correction - Function
 
-int updatePid(int id, double targetValue, double currentValue) {
+int updatePid(int idMotor, double referenceValue, double encoderValue) {
   float Kp = 0.8;
   float Kd = 0.0;
   float Ki = 0.1;
@@ -221,8 +209,8 @@ int updatePid(int id, double targetValue, double currentValue) {
   static double int_error2 = 0;
 
   // erro = kinetmatic - encoder
-  error = vel_req1-currentValue;
-  if (id == 1) {
+  double error = referenceValue-encoderValue;
+  if (idMotor == MOTOR_LEFT) {
     
     pidTerm = Kp*error + Ki*int_error1 + Kd*(error-last_error1);
     int_error1 += error;
@@ -230,25 +218,27 @@ int updatePid(int id, double targetValue, double currentValue) {
   }
   else {
     int_error2 += error;
-    pidTerm = Kp*error + Kd*(error-last_error2) + Ki*int_error2;
+    pidTerm = Kp*error + Ki*int_error2 + Kd*(error-last_error2);
     last_error2 = error;
   }
 
-  new_cmd = constrain( ((pidTerm*127)/(0.8)) , -127, 127 );
-  //new_cmd = round((pidTerm*127)/(0.8));
+  // if(encoderValue == 0){
+  //   last_error1 = 0;
+  //   last_error2 = 0;
+  //   int_error1 = 0;
+  //   int_error2 = 0;
+  // }
 
-  //new_pwm = constrain(double(command)*MAX_RPM/4095.0 + pidTerm, -MAX_RPM, MAX_RPM);
-  //new_cmd = 4095.0*new_pwm/MAX_RPM;
-
+  double new_cmd = constrain( ((pidTerm*127)/(0.8)) , -127, 127 );
   return int(new_cmd);
 }
 
 void publishVEL(unsigned long time) {
   vel_encoder_msg.header.stamp = nh.now();
   vel_encoder_msg.header.frame_id = encoder;
-  vel_encoder_msg.vector.x = vel_act1; // encoder left
-  vel_encoder_msg.vector.y = pidTerm;  // pid rad/s
-  vel_encoder_msg.vector.z = vel_req1;  // pid volts
+  vel_encoder_msg.vector.x = vel_act1;  // encoder left
+  vel_encoder_msg.vector.y = vel_act2;  // pid rad/s
+  vel_encoder_msg.vector.z = vel_req2;  // reference wr
   //vel_encoder_msg.vector.z = double(time)/1000;
   pub_encoder.publish(&vel_encoder_msg);
   nh.spinOnce();

@@ -18,7 +18,6 @@ double gyro_x = 0.0;
 double gyro_y = 0.0;
 double gyro_z = 0.0;
 
-
 double v_encoder = 0;
 double dth_encoder = 0;
 
@@ -163,8 +162,7 @@ int main(int argc, char** argv){
       odom.twist.twist.angular.y = 0;
       odom.twist.twist.angular.z = vth;
 
-      //set the covariance
-      // if (encoder_left == 0 && encoder_right == 0){
+      //set the covariance encoder
       odom.pose.covariance[0] = 5.0;
       odom.pose.covariance[7] = 5.0;
       odom.pose.covariance[14] = 1e-3;
@@ -177,21 +175,6 @@ int main(int argc, char** argv){
       odom.twist.covariance[21] = 1e6;
       odom.twist.covariance[28] = 1e6;
       odom.twist.covariance[35] = 0.5;
-      // // }
-      // // else{
-      //   odom.pose.covariance[0] = 1.0;
-      //   odom.pose.covariance[7] = 1.0;
-      //   odom.pose.covariance[14] = 1e-3;
-      //   odom.pose.covariance[21] = 0.1;
-      //   odom.pose.covariance[28] = 0.1;
-      //   odom.pose.covariance[35] = 0.1;
-      //   odom.twist.covariance[0] = 0.5;
-      //   odom.twist.covariance[7] = 1e6;
-      //   odom.twist.covariance[14] = 1e6;
-      //   odom.twist.covariance[21] = 1e6;
-      //   odom.twist.covariance[28] = 1e6;
-      //   odom.twist.covariance[35] = 0.1;
-      // }
 
       //publish the message
       odom_pub.publish(odom);
