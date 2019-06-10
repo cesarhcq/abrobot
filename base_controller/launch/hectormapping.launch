@@ -12,12 +12,12 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
 <launch>
     <include file="$(find rplidar_ros)/launch/rplidar.launch" />
     <node pkg="rosserial_python" type="serial_node.py" name="arduino_controller" output= "screen">
-        <param name="port" value="/dev/ttyACM0"/>  
+        <param name="port" value="/dev/ttyACM1"/>  
         <param name="baud" value="57600"/>
     </node>
 
     <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-        <param name="host" value="192.168.42.196" /> <!--Need to change everytime when reconnect the device-->
+        <param name="host" value="192.168.42.146" /> <!--Need to change everytime when reconnect the device-->
         <param name="num_callibration_itrs" value="1" />
         <param name="debug" value="true" />
     </node>

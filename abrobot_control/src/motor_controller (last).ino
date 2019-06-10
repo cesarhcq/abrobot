@@ -16,7 +16,7 @@
 //
 // If you want to use a pin other than TX->1, see the SoftwareSerial example.
 
-#define LOOPTIME        200   // PID loop time(ms)
+#define LOOPTIME        100   // PID loop time(ms)
 #define encoder0PinA_Left 2   // encoder A pin Left
 #define encoder0PinA_Right 3  // encoder A pin Right
 #define encoder0PinB_Left 4   // encoder B pin Left
@@ -61,12 +61,13 @@ double int_error1 = 0;
 double int_error2 = 0;
 
 double Sum_vel_Left = 0;
-double Media_Vl_encoder = 0;
 int cont_Left = 1;
 
 double Sum_vel_Right = 0;
-double Media_Vr_encoder = 0;
 int cont_Right = 1;
+
+double diffEncoder_Left = 0;
+double diffEncoder_Right = 0;
 
 //Left wheel encoder
 volatile long encoder0Pos_Left = 0;
@@ -75,7 +76,6 @@ long encoder0PosAnt_Left = 0;
 //Right wheel encoder
 volatile long encoder0Pos_Right = 0;
 long encoder0PosAnt_Right = 0;
-
 
 //ROS Function - Angular and linear Velocity Desired
 void handle_cmd(const geometry_msgs::Twist& msg){
@@ -106,7 +106,7 @@ void setup()
 {
   SabertoothTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
   //Serial.begin(9600);
-  delay(3000);
+  delay(1000);
   encoder0Pos_Left = 0;
   encoder0Pos_Right = 0;
   encoder0PosAnt_Left = 0;
@@ -154,20 +154,8 @@ void loop()
   if(time-lastMilli>= LOOPTIME){
     getMotorData(time-lastMilli);
 
-    //PWM_val1 = updatePid(1, vel_req1, vel_act1);
-
-    //PWM_val1 = ((vel_req1*127)/(0.8));
-    //PWM_val2 = ((vel_req2*127)/(0.8));
-
-    error = vel_req1-vel_act1;
-    pidTerm = (error * Kp) + ((error + epx_Right) * Ki);
-    //Integrator Cumulative Error
-    epx_Right = epx_Right + error;
-    //new_cmd = constrain( ((pidTerm*127)/(0.8)) , -127, 127 );
-    PWM_val1 = round((pidTerm*127)/(0.8));
-
-
-
+    PWM_val1 = ((vel_req1*127)/(0.6));
+    PWM_val2 = ((vel_req2*127)/(0.6));
 
     //Output Motor Left
     ST.motor(MOTOR_LEFT, PWM_val1);// vl
@@ -184,8 +172,12 @@ void getMotorData(unsigned long time)  {
   double dt = time * 0.001;
   double w1 = (encoder_pulse_left * PI / 180);
   double w2 = (encoder_pulse_right * PI / 180);
-  double vel_left = (double((encoder0Pos_Left-encoder0PosAnt_Left)*w1*R)/double(dt));
-  double vel_right = (double((encoder0Pos_Right-encoder0PosAnt_Right)*w2*R)/double(dt));
+
+  diffEncoder_Left = (encoder0Pos_Left-encoder0PosAnt_Left);
+  diffEncoder_Right = (encoder0Pos_Right-encoder0PosAnt_Right);
+
+  double vel_left = (double(diffEncoder_Left*w1*R)/double(dt));
+  double vel_right = (double(diffEncoder_Right*w2*R)/double(dt));
   encoder0PosAnt_Left = encoder0Pos_Left;
   encoder0PosAnt_Right = encoder0Pos_Right;
 
@@ -195,32 +187,38 @@ void getMotorData(unsigned long time)  {
 
 double filterLeft(double vel_left)  {
 
-  Sum_vel_Left = Sum_vel_Left + vel_left;
-  double Media = Sum_vel_Left / cont_Left;
-
   //Mean of velocity in 10 interations
   cont_Left++;
-  if(cont_Left>7){
-    Sum_vel_Left = 0;
+
+  Sum_vel_Left = Sum_vel_Left + vel_left;
+  double filter = Sum_vel_Left / cont_Left;
+
+  if(cont_Left>encoder_filter){
+    Sum_vel_Left = filter;
     cont_Left = 1;
   }
 
-  return Media;
+  if(diffEncoder_Left ==0) filter = 0;
+
+  return filter;
 }
 
 double filterRight(double vel_right)  {
 
-  Sum_vel_Right = Sum_vel_Right + vel_right;
-  double Media = Sum_vel_Right / cont_Right;
-
   //Mean of velocity in 10 interations
   cont_Right++;
-  if(cont_Right>7){
-    Sum_vel_Right = 0;
+
+  Sum_vel_Right = Sum_vel_Right + vel_right;
+  double filter = Sum_vel_Right / cont_Right;
+
+  if(cont_Right>encoder_filter){
+    Sum_vel_Right = filter;
     cont_Right = 1;
   }
 
-  return Media;
+  if(diffEncoder_Right ==0) filter = 0;
+
+  return filter;
 }
 
 // PID correction - Function
@@ -248,9 +246,9 @@ int updatePid(int id, double targetValue, double currentValue) {
 void publishVEL(unsigned long time) {
   vel_encoder_msg.header.stamp = nh.now();
   vel_encoder_msg.header.frame_id = encoder;
-  vel_encoder_msg.vector.x = vel_act1; // encoder left
-  vel_encoder_msg.vector.y = pidTerm;  // pid rad/s
-  vel_encoder_msg.vector.z = vel_req1;  // reference
+  vel_encoder_msg.vector.x = vel_act1;  // encoder left
+  vel_encoder_msg.vector.y = vel_act2;  // encoder right
+  vel_encoder_msg.vector.z = vel_req1;  // reference left
   //vel_encoder_msg.vector.z = double(time)/1000;
   pub_encoder.publish(&vel_encoder_msg);
   nh.spinOnce();
