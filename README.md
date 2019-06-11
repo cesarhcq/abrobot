@@ -157,33 +157,38 @@ sudo chmod 666 /dev/ttyUSB0
 ```
 There're two ways to run rplidar ros package
 
-### Simultaneous Localization and Mapping (SLAM) - ROS Navigation Stack
+### Simultaneous Localization and Mapping (SLAM) - ROS Navigation Stack - Real Application
 
 #### Mapping
 
-1. Saving the Map
+1. Navigate around the environment using Teleop Keyboard.
+
+2. Saving the Map
 
 ```
 rosrun map_server map_saver -f ~/ABRobot/src/abrobot/abrobot_navigation/maps/test_map
 ```
 
-2. Loading the map
+3. Loading the map
 
 ```
 roslaunch abrobot_navigation amcl_demo.launch
 ```
 
-3. Rviz visualization
+4. Rviz visualization
 
 ```
 roslaunch mybot_description mybot_rviz_amcl.launch
 ```
 
-4. Run tests Arduino
+5. Run tests on Arduino
 
 ```
 rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
 ```
+
+
+
 
 ```
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
