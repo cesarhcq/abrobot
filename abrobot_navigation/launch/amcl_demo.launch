@@ -6,17 +6,13 @@
   <arg name="map_file" default="$(find abrobot_navigation)/maps/test_map.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
-  <!-- Place map frame at odometry frame -->
- <!--  <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster"
-      args="0 0 0 0 0 0 map odom 100"/> -->
-
   <node name="arduino_controller" pkg="rosserial_python" type="serial_node.py" output= "screen">
-        <param name="port" value="/dev/ttyACM0"/>  
-        <param name="baud" value="57600"/>
+    <param name="port" value="/dev/ttyACM0"/>  
+    <param name="baud" value="57600"/>
   </node>
 
   <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-    <param name="host" value="192.168.42.146" />
+    <param name="host" value="192.168.42.101" />
     <param name="num_callibration_itrs" value="1" />
     <param name="debug" value="false" />
   </node>

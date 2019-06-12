@@ -10,23 +10,37 @@ Read the wikipage of http://wiki.ros.org/hector_mapping
 See the "map_update_distance_thresh" it means that the close obstacles can be ignored by Lidar.
  -->
 <launch>
+
+    <!--Laser rplidar-->
     <include file="$(find rplidar_ros)/launch/rplidar.launch" />
+
+    <!--Arduino Low-Controller-->
     <node pkg="rosserial_python" type="serial_node.py" name="arduino_controller" output= "screen">
-        <param name="port" value="/dev/ttyACM1"/>  
+        <param name="port" value="/dev/ttyACM0"/>  
         <param name="baud" value="57600"/>
     </node>
 
+    <!--Gyro from smartphone-->
     <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-        <param name="host" value="192.168.42.146" /> <!--Need to change everytime when reconnect the device-->
+        <param name="host" value="192.168.42.101" /> <!--Need to change everytime when reconnect the device-->
         <param name="num_callibration_itrs" value="1" />
         <param name="debug" value="true" />
     </node>
 
-
+    <!--Odometry Controller-->
     <node name="base_controller_node" pkg="base_controller" type="base_controller">
         <param name="alpha" value="0.0" />
         <param name="use_imu" value="true" />
     </node>
+
+    <!--     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
+        <param name="video_device" value="/dev/video0" />
+        <param name="image_width" value="640" />
+        <param name="image_height" value="480" />
+        <param name="pixel_format" value="yuyv" />
+        <param name="camera_frame_id" value="usb_cam" />
+        <param name="io_method" value="mmap"/>
+    </node> -->
 
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find base_controller)/rviz/rviz_laser_encoder.rviz" />
@@ -53,7 +67,7 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
         <param name="map_update_angle_thresh" value="0.1"/>
 
         <param name="map_resolution" value="0.05"/>
-        <param name="map_size" value="512"/>
+        <param name="map_size" value="1024"/>
         <param name="map_start_x" value="0.5"/>
         <param name="map_start_y" value="0.5"/>
 
