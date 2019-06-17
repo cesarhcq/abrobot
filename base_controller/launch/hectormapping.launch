@@ -22,7 +22,7 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
 
     <!--Gyro from smartphone-->
     <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-        <param name="host" value="192.168.42.101" /> <!--Need to change everytime when reconnect the device-->
+        <param name="host" value="192.168.42.233" /> <!--Need to change everytime when reconnect the device-->
         <param name="num_callibration_itrs" value="1" />
         <param name="debug" value="true" />
     </node>
@@ -33,14 +33,15 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
         <param name="use_imu" value="true" />
     </node>
 
-    <!--     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
+
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen">
         <param name="video_device" value="/dev/video0" />
         <param name="image_width" value="640" />
         <param name="image_height" value="480" />
         <param name="pixel_format" value="yuyv" />
         <param name="camera_frame_id" value="usb_cam" />
         <param name="io_method" value="mmap"/>
-    </node> -->
+    </node>
 
 
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find base_controller)/rviz/rviz_laser_encoder.rviz" />

@@ -12,7 +12,7 @@
   </node>
 
   <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-    <param name="host" value="192.168.42.101" />
+    <param name="host" value="192.168.42.233" />
     <param name="num_callibration_itrs" value="1" />
     <param name="debug" value="false" />
   </node>
@@ -22,8 +22,17 @@
     <param name="use_imu" value="true" />
   </node>
 
-  <!-- Localization -->
+  <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video1" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="yuyv" />
+    <param name="camera_frame_id" value="usb_cam" />
+    <param name="io_method" value="mmap"/>
+    <param name="camera_info_url" value="file://$(env HOME)/.ros/camera_info/head_camera.yaml"/>
+  </node>
 
+  <!-- Localization -->
   <node pkg="amcl" type="amcl" name="amcl" output="screen">
   <!-- Publish scans from best pose at a max of 10 Hz -->
   <param name="odom_model_type" value="diff"/>
@@ -120,7 +129,7 @@
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find abrobot_navigation)/amcl_real_navigation.rviz" />
 
-   <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
+<!--    <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/> -->
 
 
 </launch>

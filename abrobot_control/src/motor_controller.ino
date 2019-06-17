@@ -16,7 +16,7 @@
 //
 // If you want to use a pin other than TX->1, see the SoftwareSerial example.
 
-#define LOOPTIME        100   // PID loop time(ms)
+#define LOOPTIME        200   // PID loop time(ms)
 #define encoder0PinA_Left 2   // encoder A pin Left
 #define encoder0PinA_Right 3  // encoder A pin Right
 #define encoder0PinB_Left 4   // encoder B pin Left
@@ -145,8 +145,12 @@ void loop()
     PWM_val1 = updatePid(MOTOR_LEFT, vel_req1, vel_act1);
     PWM_val2 = updatePid(MOTOR_RIGHT, vel_req2, vel_act2);
 
+    //PWM_val1 = constrain( ((0.2*127)/0.8) , -127, 127 );
+    //PWM_val2 = constrain( ((0.2*127)/0.8) , -127, 127 );
+
+
     //Output Motor Left
-    ST.motor(MOTOR_LEFT, PWM_val1);// vl
+    ST.motor(MOTOR_LEFT, PWM_val1*1.0);// vl
     //Output Motor Right
     ST.motor(MOTOR_RIGHT, -PWM_val2);// vr
 
@@ -213,7 +217,7 @@ double filterRight(double vel_right)  {
 int updatePid(int idMotor, double referenceValue, double encoderValue) {
   float Kp = 0.6;
   float Kd = 0.0;
-  float Ki = 0.06;
+  float Ki = 0.2;
   double pidTerm = 0;
   double new_pwm = 0;
   double new_cmd = 0;
@@ -250,7 +254,7 @@ int updatePid(int idMotor, double referenceValue, double encoderValue) {
     pidTerm = 0;
   }
 
-  double constrainMotor = abs(referenceValue)*1.5;
+  double constrainMotor = abs(referenceValue)*2.0;
 
   new_pwm = constrain( ((pidTerm*127)/(0.8)) , -((constrainMotor*127)/(0.8)), ((constrainMotor*127)/(0.8)) );
   new_cmd = constrain( new_pwm , -127, 127 );
