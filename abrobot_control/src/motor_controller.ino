@@ -215,9 +215,9 @@ double filterRight(double vel_right)  {
 
 // PID correction - Function
 int updatePid(int idMotor, double referenceValue, double encoderValue) {
-  float Kp = 0.6;
-  float Kd = 0.0;
-  float Ki = 0.2;
+  float Kp = 1.8;  //2.0
+  float Kd = 0.1;  //0.1
+  float Ki = 0.5;  //0.5
   double pidTerm = 0;
   double new_pwm = 0;
   double new_cmd = 0;
