@@ -215,7 +215,7 @@ double filterRight(double vel_right)  {
 
 // PID correction - Function
 int updatePid(int idMotor, double referenceValue, double encoderValue) {
-  float Kp = 1.8;  //2.0
+  float Kp = 1.5;  //2.0
   float Kd = 0.1;  //0.1
   float Ki = 0.5;  //0.5
   double pidTerm = 0;
@@ -239,20 +239,20 @@ int updatePid(int idMotor, double referenceValue, double encoderValue) {
     pidTerm = Kp*error + Ki*int_error2 + Kd*(error-last_error2);
     last_error2 = error;
   }else{
-    last_error1 = 0;
-    last_error2 = 0;
-    int_error1 = 0;
-    int_error2 = 0;
+    // last_error1 = 0;
+    // last_error2 = 0;
+    // int_error1 = 0;
+    // int_error2 = 0;
     pidTerm = 0;
   }
 
-  if(referenceValue == 0){
-    last_error1 = 0;
-    last_error2 = 0;
-    int_error1 = 0;
-    int_error2 = 0;
-    pidTerm = 0;
-  }
+  // if(referenceValue == 0){
+  //   last_error1 = 0;
+  //   last_error2 = 0;
+  //   int_error1 = 0;
+  //   int_error2 = 0;
+  //   pidTerm = 0;
+  // }
 
   double constrainMotor = abs(referenceValue)*2.0;
 

@@ -5,10 +5,10 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Grid1
+        - /RPLidarLaserScan1
         - /TF1
         - /TF1/Frames1
         - /TF1/Tree1
-        - /TF1/Tree1/map1
         - /Image1
       Splitter Ratio: 0.5
     Tree Height: 717
@@ -99,15 +99,13 @@ Visualization Manager:
       Frames:
         All Enabled: false
         base_link:
-          Value: false
+          Value: true
         laser:
           Value: true
         map:
           Value: true
         odom:
           Value: true
-        scanmatcher_frame:
-          Value: false
       Marker Scale: 3
       Name: TF
       Show Arrows: true
@@ -119,8 +117,6 @@ Visualization Manager:
             base_link:
               laser:
                 {}
-          scanmatcher_frame:
-            {}
       Update Interval: 0
       Value: true
     - Angle Tolerance: 0.100000001
@@ -189,25 +185,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.97805405
+      Distance: 6.7748661
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.0127287442
-        Y: -0.899808645
-        Z: 0.454300463
+        X: -0.191239521
+        Y: -0.961608708
+        Z: 0.340185642
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.975398421
+      Pitch: 1.22539818
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.07039189
+      Yaw: 3.08539343
     Saved: ~
 Window Geometry:
   Displays:
