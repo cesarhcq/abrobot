@@ -86,7 +86,7 @@ int main(int argc, char** argv){
     //set tf base_link and laser 
     baselink_broadcaster.sendTransform(
     tf::StampedTransform(
-      tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.15, 0.0, 0.13)),
+      tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.0, 0.0, 0.20)),
       ros::Time::now(),"base_link", "laser"));
 
     if(!init){

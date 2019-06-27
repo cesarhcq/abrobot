@@ -12,7 +12,7 @@
   </node>
 
   <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-    <param name="host" value="192.168.42.179" />
+    <param name="host" value="192.168.42.183" />
     <param name="num_callibration_itrs" value="0" />
     <param name="debug" value="false" />
   </node>
