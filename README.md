@@ -187,12 +187,28 @@ roslaunch mybot_description mybot_rviz_amcl.launch
 rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
 ```
 
-
-
-
 ```
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 ```
 
 ```
 rosrun base_controller base_controller
+```
+
+6. Run gmaping and run tests AMCL
+
+```
+cd ~/ABRobot 
+```
+
+```
+source devel/setup.bash
+```
+
+```
+roslaunch base_controller gmapping.launch
+```
+
+```
+roslaunch abrobot_navigation amcl_demo.launch
+```
