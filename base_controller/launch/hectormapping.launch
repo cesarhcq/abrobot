@@ -22,8 +22,8 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
 
     <!--Gyro from smartphone-->
     <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-        <param name="host" value="192.168.42.246" /> <!--Need to change everytime when reconnect the device-->
-        <param name="num_callibration_itrs" value="1" />
+        <param name="host" value="192.168.42.179" /> <!--Need to change everytime when reconnect the device-->
+        <param name="num_callibration_itrs" value="0" />
         <param name="debug" value="false" />
     </node>
 

@@ -6,7 +6,7 @@
 #define encoder_pulse_left 10 //Linear speed with respect to Theta = 10 degrees (encoder sensitivity) of wheel displacement of R = 7.5 cm radius.
 #define encoder_pulse_right 2.5
 #define encoder_filter 5
-#define L 0.5 // distance between axes m
+#define L 0.4 // distance between axes m
 #define R 0.0775 // wheel radius m
 #define pi              3.1415926
 #define two_pi          6.2831853

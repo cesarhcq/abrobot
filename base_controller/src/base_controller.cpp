@@ -8,7 +8,7 @@
 #include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/Vector3.h>
 
-double L = 0.5; // distance between axes
+double L = 0.4; // distance between axes
 double R = 0.0775; // wheel radius 
 
 double encoder_left = 0;

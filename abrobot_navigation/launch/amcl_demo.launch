@@ -12,8 +12,8 @@
   </node>
 
   <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-    <param name="host" value="192.168.42.93" />
-    <param name="num_callibration_itrs" value="1" />
+    <param name="host" value="192.168.42.179" />
+    <param name="num_callibration_itrs" value="0" />
     <param name="debug" value="false" />
   </node>
 
@@ -49,15 +49,15 @@
   <!-- translation std dev, m -->
   <param name="odom_alpha3" value="0.1"/>
   <param name="odom_alpha4" value="0.1"/>
-  <param name="laser_z_hit" value="0.5"/>
+  <param name="laser_z_hit" value="0.9"/>
   <param name="laser_z_short" value="0.05"/>
   <param name="laser_z_max" value="0.05"/>
   <param name="laser_z_rand" value="0.5"/>
-  <param name="laser_sigma_hit" value="0.2"/>
+  <param name="laser_sigma_hit" value="0.1"/>
   <param name="laser_lambda_short" value="0.1"/>
   <param name="laser_model_type" value="likelihood_field"/>
   <!-- <param name="laser_model_type" value="beam"/> -->
-  <param name="laser_likelihood_max_dist" value="2.0"/>
+  <param name="laser_likelihood_max_dist" value="4.0"/>
   <param name="update_min_d" value="0.2"/>
   <param name="update_min_a" value="0.2"/>
   <param name="odom_frame_id" value="odom"/>
@@ -120,13 +120,17 @@
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <rosparam file="$(find abrobot_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find abrobot_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find abrobot_navigation)/param/local_costmap_params.yaml" command="load" />
+
     <rosparam file="$(find abrobot_navigation)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/local_costmap_params.yaml" command="load" />
+
+
     <rosparam file="$(find abrobot_navigation)/param/base_local_planner_params.yaml" command="load" />
     <rosparam file="$(find abrobot_navigation)/param/move_base_params.yaml" command="load" />
+    
     <rosparam file="$(find abrobot_navigation)/param/global_planner_params.yaml" command="load" />
     <rosparam file="$(find abrobot_navigation)/param/navfn_global_planner_params.yaml" command="load" />
-<!--     <rosparam file="$(find turtlebot_navigation)/param/dwa_local_planner_params.yaml" command="load" /> -->
+    <rosparam file="$(find abrobot_navigation)/param/dwa_local_planner_params.yaml" command="load" />
   </node>
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find abrobot_navigation)/amcl_real_navigation.rviz" />

@@ -267,8 +267,8 @@ void publishVEL(unsigned long time) {
   vel_encoder_msg.header.frame_id = encoder;
   vel_encoder_msg.vector.x = vel_act1;  // encoder left
   vel_encoder_msg.vector.y = vel_act2;  // pid rad/s
-  vel_encoder_msg.vector.z = vel_req1;  // reference wr
-  //vel_encoder_msg.vector.z = double(time)/1000;
+  //vel_encoder_msg.vector.z = vel_req1;  // reference wr
+  vel_encoder_msg.vector.z = double(time)/1000;
   pub_encoder.publish(&vel_encoder_msg);
   nh.spinOnce();
 }

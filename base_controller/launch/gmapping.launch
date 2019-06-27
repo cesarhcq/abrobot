@@ -20,9 +20,9 @@ E-mail: kint.zhao@slamtec.com
 
     <!--Gyro from smartphone-->
     <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-        <param name="host" value="192.168.42.93" /> <!--Need to change everytime when reconnect the device-->
-        <param name="num_callibration_itrs" value="1" />
-        <param name="debug" value="true" />
+        <param name="host" value="192.168.42.179" /> <!--Need to change everytime when reconnect the device-->
+        <param name="num_callibration_itrs" value="10" />
+        <param name="debug" value="false" />
     </node>
 
         <!--Odometry Controller-->
