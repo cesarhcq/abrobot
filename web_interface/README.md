@@ -20,15 +20,15 @@ Version | ROS Distro | Operating System
 
 1. Laptop / PC with installed Visual Studio Code (VSC) - [Install MS Visual Studio Code in Ubuntu 16.04/16.10](http://tipsonubuntu.com/2017/03/03/install-ms-visual-studio-code-ubuntu-16-0416-10/).
 
-- [x] First, in VSC you need to install the following plugins:
+First, in VSC you need to install the following plugins:
 
-- [x] Bootstrap 4, Font awesome 4, Font Awesome 5 Free & Pro snippets: this is the framework itself with couple of additional features which contain ready-to-use templates and other stuff useful while developing in bootstrap
+⋅⋅* Bootstrap 4, Font awesome 4, Font Awesome 5 Free & Pro snippets: this is the framework itself with couple of additional features which contain ready-to-use templates and other stuff useful while developing in bootstrap
 
-- [x] Live Server: to see your web UI changes in realtime
+⋅⋅* Live Server: to see your web UI changes in realtime
 
-- [o] Prettier Code formatter: to keep your source code clean
+⋅⋅* Prettier Code formatter: to keep your source code clean
 
-- [o] vscode-icons: to make your workspace look good
+- vscode-icons: to make your workspace look good
 
 ## Steps to create the GuntherBOT based on ROS and Gazebo Simulator
 
