@@ -1,6 +1,10 @@
-# GuntherBOT - Autonomous Mobile Robot
+# GuntherBOT - Autonomous Mobile Robot with Interface Web (Bootstrap 4 + ROS)
 
-GuntherBOT is an autonomous mobile robot developed by [Acta Visio](http://www.acta-visio.com) for warehouse indoor environments. GuntherBOT is based on Arlo Robot as mobile platform to perform different tasks in an indoor environments. GuntherBOT was developed with Robot Operating System (ROS) - see more in [ROS Wiki](https://www.ros.org/), Arduino Leonardo and Raspberry Pi 3B.
+GuntherBOT is an autonomous mobile robot developed by [Acta Visio](http://www.acta-visio.com) for warehouse indoor environments. GuntherBOT is based on Arlo Robot as mobile platform to perform different tasks in an indoor environments. GuntherBOT was developed with Robot Operating System (ROS) - see more in [ROS Wiki](https://www.ros.org/), Arduino Leonardo and Raspberry Pi 3B. 
+
+Bootstrap 4 framework allows you to create modern, great looking websites really quickly and without a big effort. It is currently one of the most popular front-end libraries for a reason. It is also open source [Bootstrap 4 + ROS](https://medium.com/husarion-blog/bootstrap-4-ros-creating-a-web-ui-for-your-robot-9a77a8e373f9) and available under developer friendly MIT license. Building websites which not only look good but also scale well on different devices such as your laptop or a mobile phone is not a big deal with Bootstrap.
+
+In this README We will show how to use that framework together with ROS (Robot Operating System) — the most popular robotic middleware — to create awesome, intuitive web user interfaces for robots.
 
 Version | ROS Distro | Operating System
 ------------ | ------------- | ------------
@@ -12,18 +16,25 @@ Version | ROS Distro | Operating System
 - [x] ROS Navigation Stack: [ROS-Planning](https://github.com/ros-planning/navigation).
 - [x] Rosserial: [Package for Arduino - Real Robot](http://wiki.ros.org/rosserial).
 
+## Requirements
+
+1. Laptop / PC with installed Visual Studio Code (VSC) - [Install MS Visual Studio Code in Ubuntu 16.04/16.10](http://tipsonubuntu.com/2017/03/03/install-ms-visual-studio-code-ubuntu-16-0416-10/).
+
+- [x] First, in VSC you need to install the following plugins:
+
+- [x] Bootstrap 4, Font awesome 4, Font Awesome 5 Free & Pro snippets: this is the framework itself with couple of additional features which contain ready-to-use templates and other stuff useful while developing in bootstrap
+
+- [x] Live Server: to see your web UI changes in realtime
+
+- [o] Prettier Code formatter: to keep your source code clean
+
+- [o] vscode-icons: to make your workspace look good
 
 ## Steps to create the GuntherBOT based on ROS and Gazebo Simulator
 
 ### The first step
 
- To create the GuntherBOT is based on Package the contains a C++ parser for the Unified Robot Description Format (URDF), which is an XML format for representing a robot model. The code API of the parser has been through our review process and will remain backwards compatible in future releases. (See more in: [URDF](http://wiki.ros.org/urdf)).
 
-### The robot model is based on Arlo Platform with Differential drive. 
-
- All components were created in the XML file with joints, collisions, pose, inertia and visual. The script file can be found here: [GuntherBOT description](https://github.com/cesarhcq/abrobot/tree/cesar-working/abrobot_description). The files used in the GuntherBOT simulation are: [Robot Xacro](https://github.com/cesarhcq/abrobot/blob/cesar-working/abrobot_description/urdf/robot2.xacro) and [Robot Gazebo](https://github.com/cesarhcq/abrobot/blob/master/abrobot_description/urdf/robot2.gazebo). If you need more information about [Arlo Description Platform](https://github.com/chrisl8/ArloBot/tree/new-serial-interface/src/arlobot/arlobot_description), visit the [Arlo Bot](https://github.com/chrisl8/ArloBot).
-
- If you need to add more sensors in your Robot, follow this great tutorial provided by: [Gazebo Sensors](http://gazebosim.org/tutorials/?tut=add_laser). Please, do not forget to add the .dae or .stl extension of the sensors.
 
 ## Steps to clone this repository
 
@@ -131,84 +142,3 @@ After IDE Arduino installed, you'll need to install the **ros_lib library**
 
 The link between ROS and Arduino is through the ros_lib library. This library will be used as any other Arduino library. To install the ros_lib library, type the following commands in the Ubuntu terminal:
 
-```
-cd <sketchbook>/libraries
-```
-```
-rosrun rosserial_arduino make_libraries.py .
-```
-
-Close the Arduino IDE and open again. Go to **sketchbook** in the Arduino IDE, and you will see the *ROS_LIB*
-
-Verify the *serial_port* connected. In our case is:
-
-> /dev/ttyACM0
-
-
-### How to run rplidar ros package
-
-Check the authority of rplidar's serial-port:
-```
-ls -l /dev |grep ttyUSB
-```
-Add the authority of write: (such as /dev/ttyUSB0)
-```
-sudo chmod 666 /dev/ttyUSB0
-```
-There're two ways to run rplidar ros package
-
-### Simultaneous Localization and Mapping (SLAM) - ROS Navigation Stack - Real Application
-
-#### Mapping
-
-1. Navigate around the environment using Teleop Keyboard.
-
-2. Saving the Map
-
-```
-rosrun map_server map_saver -f ~/ABRobot/src/abrobot/abrobot_navigation/maps/test_map
-```
-
-3. Loading the map
-
-```
-roslaunch abrobot_navigation amcl_demo.launch
-```
-
-4. Rviz visualization
-
-```
-roslaunch mybot_description mybot_rviz_amcl.launch
-```
-
-5. Run tests on Arduino
-
-```
-rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
-```
-
-```
-rosrun teleop_twist_keyboard teleop_twist_keyboard.py
-```
-
-```
-rosrun base_controller base_controller
-```
-
-6. Run gmaping and run tests AMCL
-
-```
-cd ~/ABRobot 
-```
-
-```
-source devel/setup.bash
-```
-
-```
-roslaunch base_controller gmapping.launch
-```
-
-```
-roslaunch abrobot_navigation amcl_demo.launch
-```
