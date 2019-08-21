@@ -23,13 +23,13 @@ Version | ROS Distro | Operating System
 
 First, in VSC you need to install the following plugins:
 
-- Bootstrap 4, Font awesome 4, Font Awesome 5 Free & Pro snippets: this is the framework itself with couple of additional features which contain ready-to-use templates and other stuff useful while developing in bootstrap
+- **Bootstrap 4, Font awesome 4, Font Awesome 5 Free & Pro snippets:** this is the framework itself with couple of additional features which contain ready-to-use templates and other stuff useful while developing in bootstrap
 
-- Live Server: to see your web UI changes in realtime
+- **Live Server:** to see your web UI changes in realtime
 
-- Prettier Code formatter: to keep your source code clean
+- **Prettier Code formatter:** to keep your source code clean
 
-- vscode-icons: to make your workspace look good
+- **vscode-icons:** to make your workspace look good
 
 ## 2. Physical robot or gazebo simulation model.
 
