@@ -18,7 +18,8 @@ Version | ROS Distro | Operating System
 
 ## Requirements
 
-## 1. Laptop / PC with installed Visual Studio Code (VSC) - [Install MS Visual Studio Code in Ubuntu 16.04/16.10](http://tipsonubuntu.com/2017/03/03/install-ms-visual-studio-code-ubuntu-16-0416-10/).
+## 1. Laptop / PC with installed Visual Studio Code (VSC)
+[Install MS Visual Studio Code in Ubuntu 16.04/16.10](http://tipsonubuntu.com/2017/03/03/install-ms-visual-studio-code-ubuntu-16-0416-10/).
 
 First, in VSC you need to install the following plugins:
 
@@ -30,24 +31,17 @@ First, in VSC you need to install the following plugins:
 
 - vscode-icons: to make your workspace look good
 
-## Steps to create the GuntherBOT based on ROS and Gazebo Simulator
+## 2. Physical robot or gazebo simulation model.
 
-### The first step
-
-
-
-## Steps to clone this repository
-
-1. Create a simple ROS Workspace - if you don't have yet. Following the installation instructions.
+On top of standard ROS, you will need to install couple additional packages. To do that, in your robot Linux terminal run the following commands:
 
 ```
-mkdir -p ~/guntherBot_ws/src && cd ~/guntherBot_ws
+sudo apt update
+```
 
-catkin init
+and
 
-cd ~/guntherBot_ws/src/ 
-
-git clone -b cesar-working https://github.com/cesarhcq/abrobot.git
-
-cd ~/guntherBot_ws/
+```
+sudo apt install python-tornado python-pip ros-kinetic-rosbridge-suite ros-kinetic-web-video-server nginx
+```
 
