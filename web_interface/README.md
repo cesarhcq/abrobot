@@ -13,11 +13,11 @@ Version | ROS Distro | Operating System
 ## Install dependencies and follow the installation instructions.
 
 - [x] ROS Kinetic-devel: [ROS](http://wiki.ros.org/kinetic/Installation/Ubuntu).
-- [x] [Install MS Visual Studio Code in Ubuntu 16.04/16.10](http://tipsonubuntu.com/2017/03/03/install-ms-visual-studio-code-ubuntu-16-0416-10/).
-- [x] [Bootstrap 4, Font awesome 4, Font Awesome 5 Free & Pro snippets](https://marketplace.visualstudio.com/items?itemName=thekalinga.bootstrap4-vscode).
-- [x] [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer).
-- [x] [Prettier Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode).
-- [x] [vscode-icons](https://marketplace.visualstudio.com/items?itemName=vscode-icons-team.vscode-icons).
+- [x] Install MS Visual Studio Code in Ubuntu 16.04/16.10: [VSC](http://tipsonubuntu.com/2017/03/03/install-ms-visual-studio-code-ubuntu-16-0416-10/).
+- [x] Bootstrap 4, Font awesome 4, Font Awesome 5 Free & Pro snippets: [Bootstrap 4...](https://marketplace.visualstudio.com/items?itemName=thekalinga.bootstrap4-vscode).
+- [x] Live Server: [LS](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer).
+- [x] Prettier Code formatter: [PCF](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode).
+- [x] vscode-icons:[Vsc.Icon](https://marketplace.visualstudio.com/items?itemName=vscode-icons-team.vscode-icons).
 
 ## Requirements
 
