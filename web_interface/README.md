@@ -67,6 +67,23 @@ Now right click the `index.html` file and select “Open with Live Server [Alt +
 - Add some additional scripts above `</body>` tag:
 
 ```
+<script src="https://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+<script src="https://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+<script src="https://static.robotwebtools.org/keyboardteleopjs/current/keyboardteleop.min.js"></script>
+<script src="//yoannmoinet.github.io/nipplejs/javascripts/nipplejs.js"></script>
+<script src="webui.js"></script>
+```
+
+First 3 scripts come from Robot Web Tools(http://robotwebtools.org/ ). `roslib.min.js` is basic ROS javascript library, it allows your web apps to communicate with ROS system. `eventemitter2.min`.js is a support library for handling various ROS events. `keyboardteleop.min.js` is a support library for controlling the robot using the keyboard.
+
+`nipplejs.js` is a library for creating a joystick for the web UI that is especially useful for controlling the robot on mobile devices.
+
+And finally `webui.js` will be created in the next section of this article.
+
+- Below `<body class="bg-light">` paste following code:
+
+
+```
 <!-- SPEED -->
 <div class="row">
     <div class="col-md-4"></div>
@@ -111,4 +128,178 @@ Now right click the `index.html` file and select “Open with Live Server [Alt +
 </div>
 ```
 
-Link aternative - [Link to Open](https://gist.github.com/DominikN/52daa750c924b368fdacba621bfb975f#file-bootstrap-ros-demo-2-html)
+If do not work, try this aternative link - [Link to Open](https://gist.github.com/DominikN/52daa750c924b368fdacba621bfb975f#file-bootstrap-ros-demo-2-html).
+
+This is a basic structure of your app. In consists of a placeholder for the video, joystick and slider for selecting keyboard speed. Do not worry that `<img>` tag has an empty src parameter, it will be populated by javascript.
+
+That is all for the html part, remember to save all the changes made in `index.html`.
+
+### 3. Writing the JavaScript code
+
+Create a new file, name it `webui.js` and save in the same folder as `index.html`.
+
+Begin by creating some global variables:
+
+```
+var twist;
+var cmdVel;
+var publishImmidiately = true;
+var robot_IP;
+var manager;
+var teleop;
+var ros;
+```
+
+Write a function to send ROS messages with velocity for robot:
+
+```
+function moveAction(linear, angular) {
+    if (linear !== undefined && angular !== undefined) {
+        twist.linear.x = linear;
+        twist.angular.z = angular;
+    } else {
+        twist.linear.x = 0;
+        twist.angular.z = 0;
+    }
+    cmdVel.publish(twist);
+}
+```
+
+Write a function to send ROS messages with velocity for robot:
+
+
+```
+function initVelocityPublisher() {
+    // Init message with zero values.
+    twist = new ROSLIB.Message({
+        linear: {
+            x: 0,
+            y: 0,
+            z: 0
+        },
+        angular: {
+            x: 0,
+            y: 0,
+            z: 0
+        }
+    });
+    // Init topic object
+    cmdVel = new ROSLIB.Topic({
+        ros: ros,
+        name: '/cmd_vel',
+        messageType: 'geometry_msgs/Twist'
+    });
+    // Register publisher within ROS system
+    cmdVel.advertise();
+}
+```
+
+Write a function to create keyboard controller object:
+
+```
+function initTeleopKeyboard() {
+    // Use w, s, a, d keys to drive your robot
+
+    // Check if keyboard controller was aready created
+    if (teleop == null) {
+        // Initialize the teleop.
+        teleop = new KEYBOARDTELEOP.Teleop({
+            ros: ros,
+            topic: '/cmd_vel'
+        });
+    }
+
+    // Add event listener for slider moves
+    robotSpeedRange = document.getElementById("robot-speed");
+    robotSpeedRange.oninput = function () {
+        teleop.scale = robotSpeedRange.value / 100
+    }
+}
+```
+
+Write a function to create joystick object:
+
+```
+function createJoystick() {
+    // Check if joystick was aready created
+    if (manager == null) {
+        joystickContainer = document.getElementById('joystick');
+        // joystck configuration, if you want to adjust joystick, refer to:
+        // https://yoannmoinet.github.io/nipplejs/
+        var options = {
+            zone: joystickContainer,
+            position: { left: 50 + '%', top: 105 + 'px' },
+            mode: 'static',
+            size: 200,
+            color: '#0066ff',
+            restJoystick: true
+        };
+        manager = nipplejs.create(options);
+        // event listener for joystick move
+        manager.on('move', function (evt, nipple) {
+            // nipplejs returns direction is screen coordiantes
+            // we need to rotate it, that dragging towards screen top will move robot forward
+            var direction = nipple.angle.degree - 90;
+            if (direction > 180) {
+                direction = -(450 - nipple.angle.degree);
+            }
+            // convert angles to radians and scale linear and angular speed
+            // adjust if youwant robot to drvie faster or slower
+            var lin = Math.cos(direction / 57.29) * nipple.distance * 0.005;
+            var ang = Math.sin(direction / 57.29) * nipple.distance * 0.05;
+            // nipplejs is triggering events when joystic moves each pixel
+            // we need delay between consecutive messege publications to 
+            // prevent system from being flooded by messages
+            // events triggered earlier than 50ms after last publication will be dropped 
+            if (publishImmidiately) {
+                publishImmidiately = false;
+                moveAction(lin, ang);
+                setTimeout(function () {
+                    publishImmidiately = true;
+                }, 50);
+            }
+        });
+        // event litener for joystick release, always send stop message
+        manager.on('end', function () {
+            moveAction(0, 0);
+        });
+    }
+}
+```
+
+…and finally main app initialization:
+
+```
+window.onload = function () {
+    // determine robot address automatically
+    // robot_IP = location.hostname;
+    // set robot address statically
+    robot_IP = "10.5.10.117";
+
+    // // Init handle for rosbridge_websocket
+    ros = new ROSLIB.Ros({
+        url: "ws://" + robot_IP + ":9090"
+    });
+
+    initVelocityPublisher();
+    // get handle for video placeholder
+    video = document.getElementById('video');
+    // Populate video source 
+    video.src = "http://" + robot_IP + ":8080/stream?topic=/camera/rgb/image_raw&type=mjpeg&quality=80";
+    video.onload = function () {
+        // joystick and keyboard controls will be available only when video is correctly loaded
+        createJoystick();
+        initTeleopKeyboard();
+    };
+}
+```
+
+Choose between static IP address for the robot or dynamically defined IP with `location.hostname` depending on your configuration. If the web server is running on a device different than the robot, IP must be set manually to the robot address. If the app is deployed to a server which is running on your robot, it can be set automatically.
+
+Video address string might need to be adjusted. Part `/camera/rgb/image_raw` is the topic name, where video is published by the robot. Set this topic according to your camera.
+
+You web user interface is now ready.
+
+## Running the demo on your robot
+
+### 1. Flashing default firmware to ROSbot 2.0 real-time board
