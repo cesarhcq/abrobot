@@ -57,3 +57,11 @@ Here’s how creating a new project looks like:
 Creating a new web UI project in VSC [Link-YouTube](https://www.youtube.com/watch?v=2PAQu0AnJ40)
 
 Now right click the `index.html` file and select “Open with Live Server [Alt + L Alt + O]” option. You will see an empty page in your web browser . It will be updated automatically each time you save your project. If you have trouble to use, try to make manual install in Live Server: [LS](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer).
+
+### 2. Writing the HTML code
+
+- Change the name of your page in the `<title>` tag to “ROS + Bootstrap 4 demo”: `<title>ROS + Bootstrap 4 demo</title>`
+
+- Change the page background color to `bg-light` inside the `<body>` tag: `<body class="bg-light">`
+
+- Add some additional scripts above `</body>` tag:
