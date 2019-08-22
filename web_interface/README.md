@@ -274,7 +274,7 @@ window.onload = function () {
     // determine robot address automatically
     // robot_IP = location.hostname;
     // set robot address statically
-    robot_IP = "10.5.10.117";
+    robot_IP = "10.5.10.117"; 
 
     // // Init handle for rosbridge_websocket
     ros = new ROSLIB.Ros({
@@ -285,7 +285,8 @@ window.onload = function () {
     // get handle for video placeholder
     video = document.getElementById('video');
     // Populate video source 
-    video.src = "http://" + robot_IP + ":8080/stream?topic=/camera/rgb/image_raw&type=mjpeg&quality=80";
+    video.src = "http://" + robot_IP + ":8080/stream?topic=/usb_cam/image_raw"; // set topic of camera
+    // video.src = "http://" + robot_IP + ":8080/stream?topic=/camera/rgb/image_raw&type=mjpeg&quality=80";
     video.onload = function () {
         // joystick and keyboard controls will be available only when video is correctly loaded
         createJoystick();
@@ -302,4 +303,14 @@ You web user interface is now ready.
 
 ## Running the demo on your robot
 
-### 1. Flashing default firmware to ROSbot 2.0 real-time board
+### 1. Executing ROS nodes on your robot
+
+Connect to your robot through SSH and execute the following commands in the Linux terminal (each in a separate terminal!):
+
+- `roscore` — ROS nodes will not be able to communicate without roscore. Each ROS system needs to have a roscore process running.
+    or
+   `roslaunch usb_cam usb_cam-test.launch` — Ros node of usb camera. to `topic = /usb_cam/image_raw`
+
+- `rosrun web_video_server web_video_server` — it launches the server for streaming ROS image messages as video through the web.
+
+- `roslaunch rosbridge_server rosbridge_websocket.launch` — it launches the web sockets to allow web apps to publish or subscribe ROS messages.
