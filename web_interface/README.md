@@ -65,3 +65,50 @@ Now right click the `index.html` file and select “Open with Live Server [Alt +
 - Change the page background color to `bg-light` inside the `<body>` tag: `<body class="bg-light">`
 
 - Add some additional scripts above `</body>` tag:
+
+```
+<!-- SPEED -->
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class=" col-md-4">
+        <label for="robot-speed">
+            <strong>Robot speed</strong>
+        </label>
+        <input type="range" min="15" max="80" class="custom-range" id="robot-speed">
+    </div>
+    <div class="col-md-4"></div>
+</div>
+
+<!-- VIDEO -->
+<div class="row my-4">
+    <div class="col d-flex justify-content-center">
+        <img src="" class="p-1 bg-dark" alt="" id="video" />
+    </div>
+</div>
+
+<!-- JOYSTICK -->
+<div class="row my-4">
+    <div class="col">
+        <div class="d-flex justify-content-center" style="width: 210px; height: 210px;">
+            <div id="joystick"></div>
+        </div>
+    </div>
+</div>
+
+<!-- INFO -->
+<div class="row my-4">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="alert alert-success">
+            <h4 class="alert-heading">ROS + Bootstrap interface demo</h4>
+            <ul>
+                <li>set speed using a slider</li>
+                <li>use joystick or WASD keys on keyboard to move </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+```
+
+Link aternative - [Link to Open](https://gist.github.com/DominikN/52daa750c924b368fdacba621bfb975f#file-bootstrap-ros-demo-2-html)
