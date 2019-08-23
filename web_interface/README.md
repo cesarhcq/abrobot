@@ -314,3 +314,4 @@ Connect to your robot through SSH and execute the following commands in the Linu
 - `rosrun web_video_server web_video_server` — it launches the server for streaming ROS image messages as video through the web.
 
 - `roslaunch rosbridge_server rosbridge_websocket.launch` — it launches the web sockets to allow web apps to publish or subscribe ROS messages.
+
