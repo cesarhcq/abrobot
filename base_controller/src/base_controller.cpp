@@ -6,6 +6,7 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Vector3.h>
+#include <sensor_msgs/Imu.h>
 
 double L = 0.5; // distance between axes
 double R = 0.0775; // wheel radius 
@@ -33,12 +34,13 @@ void handle_vel_encoder(const geometry_msgs::Vector3& encoder) {
 }
 
 // Gyro Function from Smartphone
-void handle_gyro( const geometry_msgs::Vector3& gyro) {
-  gyro_x = gyro.x;
-  gyro_y = gyro.y;
-  gyro_z = gyro.z;
+void handle_gyro( const sensor_msgs::Imu::ConstPtr& msg) {
+  gyro_x = msg->angular_velocity.x;
+  gyro_y = msg->angular_velocity.y;
+  gyro_z = (msg->angular_velocity.z*3.14)/180;
 
-  //ROS_INFO("gyro_z: %lf ", gyro_z);
+  ROS_INFO("gyro_z: %lf ", gyro_z);
+  //ROS_INFO("Imu angular_velocity x: [%f], y: [%f], z: [%f]", msg->angular_velocity.x,msg->angular_velocity.y,msg->angular_velocity.z);
 }
 
 // Robot Differential Drive Reverse Kinematic
@@ -54,8 +56,10 @@ int main(int argc, char** argv){
 
   ros::NodeHandle nh;
   ros::NodeHandle nh_private_("~");
-  ros::Subscriber gyro_sub = nh.subscribe("gyro", 50, handle_gyro);
+  //ros::Subscriber gyro_sub = nh.subscribe("gyro", 50, handle_gyro);
   ros::Subscriber sub = nh.subscribe("/vel_encoder", 100, handle_vel_encoder);
+  ros::Subscriber gyro_sub = nh.subscribe("/imu", 50, handle_gyro);
+
   ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
 
   // Crete tf - base link and Odometry
