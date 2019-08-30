@@ -187,12 +187,64 @@ roslaunch mybot_description mybot_rviz_amcl.launch
 rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
 ```
 
-
-
-
 ```
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 ```
 
 ```
 rosrun base_controller base_controller
+```
+
+6. Run gmaping and run tests AMCL
+
+```
+cd ~/ABRobot 
+```
+
+```
+source devel/setup.bash
+```
+
+```
+roslaunch base_controller gmapping.launch
+```
+
+```
+roslaunch abrobot_navigation amcl_demo.launch
+```
+
+
+### WiFi connection between Robot and PC
+
+The GuntherBot has a WiFi access point ```ssid: ubiquityrobot```. 
+
+Assuming that:
+
+* Gunther (IP: 10.42.0.1)
+
+* PC (IP: 10.42.0.98)
+
+1. In the PC or Laptop, open a terminal and type the following command:
+
+```ssh -X ubuntu@10.42.0.1```
+
+```password:ubuntu```
+
+2. In the same terminal of the SSH, type:
+
+```export ROS_MASTER_URI=http://10.42.0.1:11311```
+
+```export ROS_IP=10.42.0.1```
+
+Now, you can execute the launch file with roscore information
+
+3. Open a new terminal again in the PC or Laptop and type:
+
+**Does not need to use ssh again!**
+
+```export ROS_MASTER_URI=http://10.42.0.1:11311```
+
+```export ROS_IP=10.42.0.98```
+
+```rosrun rviz rviz```
+
