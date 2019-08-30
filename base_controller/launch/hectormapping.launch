@@ -14,7 +14,7 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
     <!--Laser rplidar-->
     <include file="$(find rplidar_ros)/launch/rplidar.launch" />
 
-    <!--Arduino Low-Controller-->
+    <!--Arduino Low-Controller -->
     <node pkg="rosserial_python" type="serial_node.py" name="arduino_controller" output= "screen">
         <param name="port" value="/dev/ttyACM0"/>  
         <param name="baud" value="57600"/>
@@ -45,7 +45,7 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
     </node>
 
 
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find base_controller)/rviz/rviz_laser_encoder.rviz" />
+    <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find base_controller)/rviz/rviz_laser_encoder.rviz" /> -->
 
     <node pkg="hector_mapping" type="hector_mapping" name="hector_height_mapping" output="screen">
         
@@ -84,6 +84,6 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
         <arg name="map_file_path" value="$(arg geotiff_map_file_path)"/>
     </include>
 
-    <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
+    <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen"/>
 
 </launch>
