@@ -1,23 +1,26 @@
 TrajectoryPlannerROS:
-  max_vel_x: 0.22
-  min_vel_x: -0.22
-  max_vel_y: 0.0
-  min_vel_y: 0.0
-  max_vel_theta: 0.33
-  min_vel_theta: -0.33
-  min_in_place_vel_theta: 0.4
-  escape_vel: -0.1
+  max_vel_x: 0.2
+  min_vel_x: -0.2 # Setting min_vel_x above zero means robot will never spin in place!
 
-  acc_lim_theta: 0.2
+  max_vel_y: 0.2
+  min_vel_y: -0.2
+
+
+  max_vel_theta: 1.0
+  min_vel_theta: -0.5
+  min_in_place_vel_theta: 0.5 #velocidade rotacional mínima permitida para a base do robô, enquanto está realizando a rotação na sua base
+  escape_vel: -0.2  #Velocidade usada para dirigir durante fugas em metros / seg. Note que deve ser negativo para que o robô realmente reverta. Uma velocidade positiva fará com que o robô avance enquanto tenta escapar
+
+  acc_lim_theta: 2.0
   acc_lim_x: 1.0
   acc_lim_y: 0.0
 
   yaw_goal_tolerance: 0.2
   xy_goal_tolerance: 0.2
 
-  sim_time: 5.0
+  sim_time: 4.0
   vx_samples: 20
-  vtheta_samples: 30
+  vtheta_samples: 40
 
   holonomic_robot: false
 

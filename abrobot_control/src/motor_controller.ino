@@ -24,7 +24,7 @@
 #define MOTOR_RIGHT 1         // motor pin Right
 
 #define PWM_1 9         // motor pin Right
-#define PWM_2 10         // motor pin Right
+#define PWM_2 11         // motor pin Right
 
 #include "robot_specs.h"
 #include <ArduinoHardware.h>
