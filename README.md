@@ -199,7 +199,6 @@ rosrun base_controller base_controller
 
 ```
 cd ~/ABRobot 
-<<<<<<< HEAD
 ```
 
 ```
@@ -207,15 +206,6 @@ source devel/setup.bash
 ```
 
 ```
-=======
-```
-
-```
-source devel/setup.bash
-```
-
-```
->>>>>>> raspi-kinetic
 roslaunch base_controller gmapping.launch
 ```
 
@@ -258,7 +248,4 @@ Now, you can execute the launch file with roscore information
 
 ```rosrun rviz rviz```
 
-<<<<<<< HEAD
-=======
 
->>>>>>> raspi-kinetic
