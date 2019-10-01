@@ -5,6 +5,7 @@
   
   <!-- Map server -->
 
+
   <arg name="map_file" default="$(find abrobot_navigation)/maps/test5_map.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
@@ -17,7 +18,6 @@
 	<include file="$(find i2c_imu)/launch/i2c_imu_auto.launch" />
 
   <!-- IMU data from smartphone -->
-
   <!--<node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
     <param name="host" value="192.168.42.93" />
     <param name="num_callibration_itrs" value="1" />
