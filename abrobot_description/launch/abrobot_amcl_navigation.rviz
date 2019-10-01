@@ -9,8 +9,6 @@ Panels:
         - /Grid1
         - /TF1
         - /TF1/Frames1
-        - /LaserScan1
-        - /Pose1
       Splitter Ratio: 0.5
     Tree Height: 747
   - Class: rviz/Selection
@@ -53,7 +51,7 @@ Visualization Manager:
         Z: 0
       Plane: XY
       Plane Cell Count: 10
-      Reference Frame: map
+      Reference Frame: odom
       Value: true
     - Class: rviz/TF
       Enabled: true
@@ -65,45 +63,42 @@ Visualization Manager:
         base_link:
           Value: true
         battery_box:
-          Value: true
+          Value: false
         front_caster:
           Value: true
         left_axle_link:
-          Value: true
+          Value: false
         left_wheel_link:
-          Value: true
-        map:
           Value: false
         odom:
           Value: false
         rear_caster:
           Value: true
         right_axle_link:
-          Value: true
+          Value: false
         right_wheel_link:
-          Value: true
+          Value: false
       Marker Scale: 2
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          odom:
-            base_link:
-              base_laser:
-                {}
-              battery_box:
-                left_axle_link:
-                  left_wheel_link:
-                    {}
-                right_axle_link:
-                  right_wheel_link:
-                    {}
-              front_caster:
-                {}
-              rear_caster:
-                {}
+        odom:
+          base_link:
+            base_laser:
+              {}
+            battery_box:
+              left_axle_link:
+                left_wheel_link:
+                  {}
+              right_axle_link:
+                right_wheel_link:
+                  {}
+            front_caster:
+              {}
+            rear_caster:
+              {}
       Update Interval: 0
       Value: true
     - Alpha: 0.699999988
@@ -149,63 +144,18 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz/RobotModel
       Collision Enabled: false
-      Enabled: true
+      Enabled: false
       Links:
         All Links Enabled: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_laser:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        battery_box:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        front_caster:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_axle_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        left_wheel_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        rear_caster:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_axle_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        right_wheel_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
       Update Interval: 0
-      Value: true
+      Value: false
       Visual Enabled: true
     - Alpha: 1
       Class: rviz/Polygon
@@ -300,7 +250,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: map
+    Fixed Frame: base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -321,25 +271,28 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 41.5363464
+
+      Distance: 15.33599
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
-        Swap Stereo Eyes: false
+        Swap Stere<<<<<<< mastero Eyes: false
         Value: false
       Focal Point:
-        X: -5.80395699
-        Y: 2.52746773
-        Z: -12.1239653
+        X: 0.308440745
+        Y: -6.23953581
+        Z: -9.3486948
+
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.02479684
+
+      Pitch: 0.949796915
       Target Frame: map
       Value: Orbit (rviz)
-      Yaw: 6.18042231
+      Yaw: 1.63723719
     Saved: ~
 Window Geometry:
   Displays:

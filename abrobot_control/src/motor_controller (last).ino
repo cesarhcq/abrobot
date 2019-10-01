@@ -16,7 +16,7 @@
 //
 // If you want to use a pin other than TX->1, see the SoftwareSerial example.
 
-#define LOOPTIME        200   // PID loop time(ms)
+#define LOOPTIME        100   // PID loop time(ms)
 #define encoder0PinA_Left 2   // encoder A pin Left
 #define encoder0PinA_Right 3  // encoder A pin Right
 #define encoder0PinB_Left 4   // encoder B pin Left
@@ -24,7 +24,7 @@
 #define MOTOR_RIGHT 1         // motor pin Right
 
 #define PWM_1 9         // motor pin Right
-#define PWM_2 11         // motor pin Right
+#define PWM_2 10         // motor pin Right
 
 #include "robot_specs.h"
 #include <ArduinoHardware.h>
@@ -32,7 +32,7 @@
 #include <ros/time.h>
 #include <math.h>
 #include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Vector3.h>
+#include <geometry_msgs/Vector3Stamped.h>
 #include <geometry_msgs/Point32.h>
 #include <SabertoothSimplified.h>
 
@@ -46,14 +46,28 @@ double vel_act1 = 0;
 double vel_act2 = 0;
 int PWM_val1 = 0;
 int PWM_val2 = 0;
+float Kp =   0.8;
+float Kd =   0.0;
+float Ki =   0.08;
 
-double pidOut = 0;
+double error = 0;
+double pidTerm = 0;
+double new_cmd = 0;
+double epx_Right = 0;
+
+double last_error1 = 0;
+double last_error2 = 0;
+double int_error1 = 0;
+double int_error2 = 0;
 
 double Sum_vel_Left = 0;
 int cont_Left = 1;
 
 double Sum_vel_Right = 0;
 int cont_Right = 1;
+
+double diffEncoder_Left = 0;
+double diffEncoder_Right = 0;
 
 //Left wheel encoder
 volatile long encoder0Pos_Left = 0;
@@ -62,9 +76,6 @@ long encoder0PosAnt_Left = 0;
 //Right wheel encoder
 volatile long encoder0Pos_Right = 0;
 long encoder0PosAnt_Right = 0;
-
-double diffEncoder_Left = 0;
-double diffEncoder_Right = 0;
 
 //ROS Function - Angular and linear Velocity Desired
 void handle_cmd(const geometry_msgs::Twist& msg){
@@ -81,11 +92,12 @@ void handle_cmd(const geometry_msgs::Twist& msg){
 }
 
 // *********************************************
+
 ros::NodeHandle  nh;
 //Subscribers
 ros::Subscriber<geometry_msgs::Twist> sub_rasp("/cmd_vel", &handle_cmd);
 //Publisher
-geometry_msgs::Vector3 vel_encoder_msg;
+geometry_msgs::Vector3Stamped vel_encoder_msg;
 ros::Publisher pub_encoder("/vel_encoder", &vel_encoder_msg);
 
 // *********************************************
@@ -142,15 +154,11 @@ void loop()
   if(time-lastMilli>= LOOPTIME){
     getMotorData(time-lastMilli);
 
-    PWM_val1 = updatePid(MOTOR_LEFT, vel_req1, vel_act1);
-    PWM_val2 = updatePid(MOTOR_RIGHT, vel_req2, vel_act2);
-
-    //PWM_val1 = constrain( ((0.2*127)/0.8) , -127, 127 );
-    //PWM_val2 = constrain( ((0.2*127)/0.8) , -127, 127 );
-
+    PWM_val1 = ((vel_req1*127)/(0.6));
+    PWM_val2 = ((vel_req2*127)/(0.6));
 
     //Output Motor Left
-    ST.motor(MOTOR_LEFT, PWM_val1*1.0);// vl
+    ST.motor(MOTOR_LEFT, PWM_val1);// vl
     //Output Motor Right
     ST.motor(MOTOR_RIGHT, -PWM_val2);// vr
 
@@ -214,61 +222,34 @@ double filterRight(double vel_right)  {
 }
 
 // PID correction - Function
-int updatePid(int idMotor, double referenceValue, double encoderValue) {
-  float Kp = 1.5;  //2.0
-  float Kd = 0.1;  //0.1
-  float Ki = 0.5;  //0.5
-  double pidTerm = 0;
-  double new_pwm = 0;
-  double new_cmd = 0;
-  static double last_error1 = 0;
-  static double last_error2 = 0;
-  static double int_error1 = 0;
-  static double int_error2 = 0;
+
+int updatePid(int id, double targetValue, double currentValue) {
 
   // erro = kinetmatic - encoder
-  double error = referenceValue-encoderValue;
-  if (idMotor == 2) { //left
-    
-    pidTerm = Kp*error + Ki*int_error1 + Kd*(error-last_error1);
-    int_error1 += error;
-    last_error1 = error;
-  }
-  else if(idMotor == 1){ //right
-    int_error2 += error;
-    pidTerm = Kp*error + Ki*int_error2 + Kd*(error-last_error2);
-    last_error2 = error;
-  }else{
-    // last_error1 = 0;
-    // last_error2 = 0;
-    // int_error1 = 0;
-    // int_error2 = 0;
-    pidTerm = 0;
-  }
+  error = vel_req1-currentValue;
 
-  // if(referenceValue == 0){
-  //   last_error1 = 0;
-  //   last_error2 = 0;
-  //   int_error1 = 0;
-  //   int_error2 = 0;
-  //   pidTerm = 0;
-  // }
+  pidTerm = (error * Kp) + ((error + epx_Right) * Ki);
+  //Integrator Cumulative Error
+  epx_Right = epx_Right + error;
 
-  double constrainMotor = abs(referenceValue)*2.0;
 
-  new_pwm = constrain( ((pidTerm*127)/(0.8)) , -((constrainMotor*127)/(0.8)), ((constrainMotor*127)/(0.8)) );
-  new_cmd = constrain( new_pwm , -127, 127 );
+
+  //new_cmd = constrain( ((pidTerm*127)/(0.8)) , -127, 127 );
+  new_cmd = round((pidTerm*127)/(0.8));
+
+  //new_pwm = constrain(double(command)*MAX_RPM/4095.0 + pidTerm, -MAX_RPM, MAX_RPM);
+  //new_cmd = 4095.0*new_pwm/MAX_RPM;
 
   return int(new_cmd);
 }
 
 void publishVEL(unsigned long time) {
-  //vel_encoder_msg.header.stamp = nh.now();
-  //vel_encoder_msg.header.frame_id = encoder;
-  vel_encoder_msg.x = vel_act1;  // encoder left
-  vel_encoder_msg.y = vel_act2;  // pid rad/s
-  //vel_encoder_msg.vector.z = vel_req1;  // reference wr
-  vel_encoder_msg.z = double(time)/1000;
+  vel_encoder_msg.header.stamp = nh.now();
+  vel_encoder_msg.header.frame_id = encoder;
+  vel_encoder_msg.vector.x = vel_act1;  // encoder left
+  vel_encoder_msg.vector.y = vel_act2;  // encoder right
+  vel_encoder_msg.vector.z = vel_req1;  // reference left
+  //vel_encoder_msg.vector.z = double(time)/1000;
   pub_encoder.publish(&vel_encoder_msg);
   nh.spinOnce();
 }

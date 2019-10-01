@@ -1,0 +1,12 @@
+<launch>
+	
+	<!--Arduino Low-Controller -->
+    <node pkg="rosserial_python" type="serial_node.py" name="arduino_controller" output= "screen">
+        <param name="port" value="/dev/ttyACM0"/>  
+        <param name="baud" value="57600"/>
+    </node>
+
+    <!-- GuntherTeleop -->
+	<node name="gunther" pkg="abrobot_control" type="gunther_teleop.py" output="screen" launch-prefix="xterm -e"/>
+
+</launch>
