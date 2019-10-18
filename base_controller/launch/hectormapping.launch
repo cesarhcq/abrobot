@@ -24,11 +24,11 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
     </node>
 
     <!--Gyro from smartphone-->
-    <!-- <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen"> -->
-    <!--    <param name="host" value="192.168.42.225" /> --> <!--Need to change everytime when reconnect the device-->
-    <!--    <param name="num_callibration_itrs" value="1" /> -->
-    <!--     <param name="debug" value="false" /> -->
-    <!--    </node> -->
+    <node name="imu_node" pkg="arduino_controller" type="gyro.py" output="screen">
+       <param name="host" value="192.168.42.142" /> <!--Need to change everytime when reconnect the device-->
+       <param name="num_callibration_itrs" value="1" />
+        <param name="debug" value="false" />
+    </node>
 
     <!--Odometry Controller-->
     <node name="base_controller_node" pkg="base_controller" type="base_controller">

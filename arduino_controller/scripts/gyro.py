@@ -2,6 +2,13 @@
 #author: Sung Jik Cha
 #credits: ros turtlebot node: https://github.com/Arkapravo/turtlebot
 
+#### Connection Settings #### App HyperIMU (Smartphone)
+# Stream Protocol = UDP
+# Sampling rate(ms) = 50
+# Server IP address = 192.168.*
+# Server Port number = 5555
+
+
 import rospy
 import socket
 import tf

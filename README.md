@@ -289,7 +289,9 @@ rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/base_controller/rviz/rviz_encoder_g
 1. Navigate around the environment using Teleop Keyboard.
 
 ```
-roslaunch arduino_controller teleop.launch
+roslaunch base_controller hectormapping.launch
+
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/base_controller/rviz/rviz_encoder_gyro.rviz
 ```
 
 2. Saving the Map
@@ -301,7 +303,7 @@ rosrun map_server map_saver -f ~/abrobot_ws/src/abrobot/abrobot_navigation/maps/
 3. Loading the map
 
 ```
-roslaunch autonomous_navigation amcl_navigation.launch
+roslaunch abrobot_navigation amcl_navigation.launch
 ```
 
 4. Rviz visualization

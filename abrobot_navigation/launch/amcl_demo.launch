@@ -1,29 +1,31 @@
 <?xml version="1.0"?>
 <launch>
+
   <master auto="start"/>
+  <!--Laser rplidar-->
   <include file="$(find rplidar_ros)/launch/rplidar.launch" />
   
   <!-- Map server -->
-
-  <arg name="map_file" default="$(find abrobot_navigation)/maps/test5_map.yaml"/>
+  <arg name="map_file" default="$(find autonomous_navigation)/maps/test_map2.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
+  <!--Arduino Low-Controller -->
   <node name="arduino_controller" pkg="rosserial_python" type="serial_node.py" output= "screen">
     <param name="port" value="/dev/ttyACM0"/>  
     <param name="baud" value="57600"/>
   </node>
 
 	<!-- Gyro from MPU9250 -->
-	<include file="$(find i2c_imu)/launch/i2c_imu_auto.launch" />
+	<!-- <include file="$(find i2c_imu)/launch/i2c_imu_auto.launch" /> -->
 
   <!-- IMU data from smartphone -->
-
-  <!--<node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
-    <param name="host" value="192.168.42.93" />
+  <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen">
+    <param name="host" value="192.168.42.142" />
     <param name="num_callibration_itrs" value="1" />
     <param name="debug" value="false" />
-  </node>-->
+  </node>
 
+  <!--Odometry Controller-->
   <node name="base_controller_node" pkg="base_controller" type="base_controller">
     <param name="alpha" value="0.0" />
     <param name="use_imu" value="true" />
@@ -112,11 +114,11 @@
 
   <!-- Move base -->
 <!--   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <rosparam file="$(find abrobot_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find abrobot_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find abrobot_navigation)/config/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find abrobot_navigation)/config/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find abrobot_navigation)/config/planner.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find autonomous_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find autonomous_navigation)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/config/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/config/planner.yaml" command="load" />
     
     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/> 
     <param name="base_global_planner" value="navfn/NavfnROS"/>
@@ -125,22 +127,22 @@
   </node> -->
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <rosparam file="$(find abrobot_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find abrobot_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find autonomous_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find autonomous_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
 
-    <rosparam file="$(find abrobot_navigation)/param/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find abrobot_navigation)/param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/param/local_costmap_params.yaml" command="load" />
 
 
-    <rosparam file="$(find abrobot_navigation)/param/base_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find abrobot_navigation)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/param/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/param/move_base_params.yaml" command="load" />
     
-    <rosparam file="$(find abrobot_navigation)/param/global_planner_params.yaml" command="load" />
-    <rosparam file="$(find abrobot_navigation)/param/navfn_global_planner_params.yaml" command="load" />
-    <rosparam file="$(find abrobot_navigation)/param/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/param/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/param/navfn_global_planner_params.yaml" command="load" />
+    <rosparam file="$(find autonomous_navigation)/param/dwa_local_planner_params.yaml" command="load" />
   </node>
 
-  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find abrobot_navigation)/amcl_real_navigation.rviz" /> -->
+  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find autonomous_navigation)/amcl_real_navigation.rviz" /> -->
 
  <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/> 
 
