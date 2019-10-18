@@ -38,6 +38,8 @@ cd ~/abrobot_ws/src/
 
 git clone git@github.com:cesarhcq/abrobot.git
 
+git clone git@github.com:Slamtec/rplidar_ros.git
+
 cd ~/abrobot_ws/
 
 catkin_make
@@ -214,7 +216,7 @@ roslaunch arduino_controller test_encoder.launch
 6. Rviz visualization
 
 ```
-rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/abrobot_control/rviz/rviz_test_arduino.rviz
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/arduino_controller/rviz/rviz_test_arduino.rviz
 ```
 
 Close the Arduino IDE and open again. Go to **sketchbook** in the Arduino IDE, and you will see the *ROS_LIB*
@@ -225,6 +227,8 @@ Verify the *serial_port* connected. In our case is:
 
 
 ### How to run rplidar ros package
+
+You need to install package rplidar in 'http://wiki.ros.org/rplidar' and 'https://github.com/Slamtec/rplidar_ros'
 
 Check the authority of rplidar's serial-port:
 
@@ -238,8 +242,9 @@ Add the authority of write: (such as /dev/ttyUSB0)
 sudo chmod 666 /dev/ttyUSB0
 ```
 
-There're two ways to run rplidar ros package
-
+```
+roslaunch rplidar_ros view_rplidar.launch
+```
 
 ### Simultaneous Localization and Mapping (SLAM) - ROS Navigation Stack - Real Application
 

@@ -9,4 +9,13 @@
     <!-- GuntherTeleop -->
 	<node name="GuntherTeleop" pkg="arduino_controller" type="gunther_teleop.py" output="screen" launch-prefix="xterm -e"/>
 
+	<!-- Screen Encoder Data -->
+	<node pkg="rostopic" type="rostopic" name="encoder" args="echo /vel_encoder" output="screen"/>
+
+	<!--Odometry Controller-->
+    <node name="base_controller_node" pkg="base_controller" type="base_controller">
+        <param name="alpha" value="1.0" />
+        <param name="use_imu" value="false" />
+    </node>
+
 </launch>
