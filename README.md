@@ -227,14 +227,19 @@ Verify the *serial_port* connected. In our case is:
 ### How to run rplidar ros package
 
 Check the authority of rplidar's serial-port:
+
 ```
 ls -l /dev |grep ttyUSB
 ```
+
 Add the authority of write: (such as /dev/ttyUSB0)
+
 ```
 sudo chmod 666 /dev/ttyUSB0
 ```
+
 There're two ways to run rplidar ros package
+
 
 ### Simultaneous Localization and Mapping (SLAM) - ROS Navigation Stack - Real Application
 
@@ -259,7 +264,7 @@ roslaunch base_controller hectormapping.launch
 Rviz visualization
 
 ```
-rosrun rviz rviz -d ~/guntherBot_ws/src/GuntherBot/base_controller/rviz/rviz_encoder_gyro.rviz
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/base_controller/rviz/rviz_encoder_gyro.rviz
 ```
 
 #### Mapping
@@ -273,7 +278,7 @@ roslaunch arduino_controller teleop.launch
 2. Saving the Map
 
 ```
-rosrun map_server map_saver -f ~/guntherBot_ws/src/GuntherBot/autonomous_navigation/maps/test_map
+rosrun map_server map_saver -f ~/abrobot_ws/src/abrobot/abrobot_navigation/maps/test_map.yaml
 ```
 
 3. Loading the map
@@ -285,13 +290,13 @@ roslaunch autonomous_navigation amcl_navigation.launch
 4. Rviz visualization
 
 ```
-rosrun rviz rviz -d ~/guntherBot_ws/src/GuntherBot/autonomous_navigation/rviz/robot_amcl_navigation.rviz
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/abrobot_navigation/rviz/robot_amcl_navigation.rviz
 ```
 
 or
 
 ```
-rosrun rviz rviz -d ~/guntherBot_ws/src/GuntherBot/autonomous_navigation/rviz/amcl_real_navigation.rviz
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/abrobot_navigation/rviz/amcl_real_navigation.rviz
 ```
 
 ### WiFi connection between Robot and PC
