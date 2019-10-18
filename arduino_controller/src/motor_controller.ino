@@ -5,26 +5,35 @@
 // This sample uses a baud rate of 9600 (page 6 and 16 on Sabertotth2x60 manual).
 //
 // Connections to make (See Gunther_Assembly_Manual):
-//   Arduino TX->1  ->  Sabertooth S1
-//   Arduino GND    ->  Sabertooth 0V
-//   Arduino VIN    ->  Sabertooth 5V (OPTIONAL, if you want the Sabertooth to power the Arduino)
-//   Arduino PIN 3  ->  Encoder white cable LA 
-//   Arduino PIN 4  ->  Encoder white cable LB
-//   Arduino PIN 5  ->  Encoder white cable RA
-//   Arduino PIN 6  ->  Encoder white cable RB
+//   Arduino TX->1    ->  Sabertooth S1
+//   Arduino Rx->19   ->  Raspberry Rx->10
+//   Arduino Tx->18   ->  Raspberry Tx->08
+//   Arduino VIN      ->  Sabertooth 5V (OPTIONAL, if you want the Sabertooth to power the Arduino)
+//   Arduino GND      ->  Sabertooth 0V
+//   Arduino PIN 2    ->  Encoder white cable LA
+//   Arduino PIN 4    ->  Encoder white cable LB
+//
+//   Arduino PIN 3      ->  Encoder blue RA
+//   Arduino PWM_R1(9)  ->  Motor pin Right
+//   Arduino PWM_R2(11) ->  Motor pin Right
 //   https://learn.parallax.com/tutorials/robot/arlo/arlo-robot-assembly-guide/section-1-motor-mount-and-wheel-kit-assembly/step-6
 //
 // If you want to use a pin other than TX->1, see the SoftwareSerial example.
 
 #define LOOPTIME        200   // PID loop time(ms)
-#define encoder0PinA_Left 2   // encoder A pin Left
-#define encoder0PinA_Right 3  // encoder A pin Right
-#define encoder0PinB_Left 4   // encoder B pin Left
-#define MOTOR_LEFT 2          // motor pin Left
-#define MOTOR_RIGHT 1         // motor pin Right
 
-#define PWM_1 9         // motor pin Right
-#define PWM_2 11         // motor pin Right
+#define encoder0PinA_Left 2   // Encoder white cable LA
+#define encoder0PinB_Left 4   // Encoder white cable LB
+#define encoder0PinA_Right 3  // Encoder RA
+
+#define PWM_R1 9              // Motor direction sinal pin Right
+#define PWM_R2 11             // Motor direction sinal pin Right
+
+//#define PWM_L1 5               // Motor direction sinal pin Left
+//#define PWM_L2 7               // Motor direction sinal pin Left
+
+#define MOTOR_LEFT 2          // Motor Left PID Controll
+#define MOTOR_RIGHT 1         // Motor Right PID Controll
 
 #include "robot_specs.h"
 #include <ArduinoHardware.h>
@@ -92,8 +101,8 @@ ros::Publisher pub_encoder("/vel_encoder", &vel_encoder_msg);
 
 void setup()
 {
-  SabertoothTXPinSerial.begin(9600); // This is the baud rate you chose with the DIP switches.
-  //Serial.begin(9600);
+  SabertoothTXPinSerial.begin(9600); // MEGA-> SABERTOOTH: 0 (RX), 1 (TX)
+  //Serial1.begin(57600);              // MEGA-> RASPBERRY: Serial1 PINS = 19 (RX), 18 (TX)
   delay(1000);
   encoder0Pos_Left = 0;
   encoder0Pos_Right = 0;
@@ -119,8 +128,8 @@ void setup()
   nh.subscribe(sub_rasp);
   nh.advertise(pub_encoder);
 
-  pinMode(PWM_1, INPUT);
-  pinMode(PWM_2, INPUT);
+  pinMode(PWM_R1, INPUT);
+  pinMode(PWM_R2, INPUT);
 
   pinMode (encoder0PinA_Left, INPUT);
   pinMode (encoder0PinB_Left, INPUT);
@@ -130,8 +139,8 @@ void setup()
   digitalWrite(encoder0PinB_Left, HIGH); 
   digitalWrite(encoder0PinA_Right, HIGH);
 
-  attachInterrupt(1, encoder_Left, RISING); // encoder left
-  attachInterrupt(0, encoder_Right, RISING); // encoder right
+  attachInterrupt(1, call_encoder_Left, RISING);  // Int.1 encoder left pin 2 (Interrupction - Arduino Leonardo)
+  attachInterrupt(0, call_encoder_Right, RISING); // Int.0 encoder left pin 3 (Interrupction - Arduino Leonardo)
 
 }
 
@@ -150,7 +159,7 @@ void loop()
 
 
     //Output Motor Left
-    ST.motor(MOTOR_LEFT, PWM_val1*1.0);// vl
+    ST.motor(MOTOR_LEFT, PWM_val1);// vl
     //Output Motor Right
     ST.motor(MOTOR_RIGHT, -PWM_val2);// vr
 
@@ -246,14 +255,6 @@ int updatePid(int idMotor, double referenceValue, double encoderValue) {
     pidTerm = 0;
   }
 
-  // if(referenceValue == 0){
-  //   last_error1 = 0;
-  //   last_error2 = 0;
-  //   int_error1 = 0;
-  //   int_error2 = 0;
-  //   pidTerm = 0;
-  // }
-
   double constrainMotor = abs(referenceValue)*2.0;
 
   new_pwm = constrain( ((pidTerm*127)/(0.8)) , -((constrainMotor*127)/(0.8)), ((constrainMotor*127)/(0.8)) );
@@ -273,13 +274,13 @@ void publishVEL(unsigned long time) {
   nh.spinOnce();
 }
 
-void encoder_Left() {
+void call_encoder_Left() {
   if (digitalRead(encoder0PinA_Left) == digitalRead(encoder0PinB_Left)) encoder0Pos_Left++;
   else encoder0Pos_Left--;
 }
-void encoder_Right() {
-  int pwm_value_1 = pulseIn(PWM_1, HIGH);
-  int pwm_value_2 = pulseIn(PWM_2, HIGH);
+void call_encoder_Right() {
+  int pwm_value_1 = pulseIn(PWM_R1, HIGH);
+  int pwm_value_2 = pulseIn(PWM_R2, HIGH);
   if ((pwm_value_1 - pwm_value_2) > 0) encoder0Pos_Right++;
   else encoder0Pos_Right--;
 }

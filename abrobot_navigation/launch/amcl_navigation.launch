@@ -8,10 +8,10 @@
   <include file="$(find rplidar_ros)/launch/rplidar.launch" />
 
   <!-- Gyro from MPU9250 -->
-  <include file="$(find i2c_imu)/launch/i2c_imu_auto.launch" />
+  <!-- <include file="$(find i2c_imu)/launch/i2c_imu_auto.launch" /> -->
   
   <!-- Map server -->
-  <arg name="map_file" default="$(find autonomous_navigation)/maps/test5_map.yaml"/>
+  <arg name="map_file" default="$(find abrobot_navigation)/maps/test_map2.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <!--Arduino Low-Controller -->
@@ -74,22 +74,22 @@
   </node>
 
   <node name="move_base" pkg="move_base" type="move_base" respawn="false" output="screen">
-    <rosparam file="$(find autonomous_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find autonomous_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find abrobot_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find abrobot_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
 
-    <rosparam file="$(find autonomous_navigation)/param/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find autonomous_navigation)/param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/local_costmap_params.yaml" command="load" />
 
 
-    <rosparam file="$(find autonomous_navigation)/param/base_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find autonomous_navigation)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/base_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/move_base_params.yaml" command="load" />
     
-    <rosparam file="$(find autonomous_navigation)/param/global_planner_params.yaml" command="load" />
-    <rosparam file="$(find autonomous_navigation)/param/navfn_global_planner_params.yaml" command="load" />
-    <rosparam file="$(find autonomous_navigation)/param/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/navfn_global_planner_params.yaml" command="load" />
+    <rosparam file="$(find abrobot_navigation)/param/dwa_local_planner_params.yaml" command="load" />
   </node>
 
-  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find autonomous_navigation)/rviz/amcl_real_navigation.rviz" /> -->
+  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find abrobot_navigation)/rviz/amcl_real_navigation.rviz" /> -->
 
   <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/> 
 
