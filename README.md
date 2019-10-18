@@ -234,7 +234,9 @@ Verify the *serial_port* connected. In our case is:
 
 ### How to run rplidar ros package
 
-You need to install package rplidar in 'http://wiki.ros.org/rplidar' and 'https://github.com/Slamtec/rplidar_ros'
+Check if you install package rplidar in
+
+- [x] Rplidar ROS: [Package for Laser](http://wiki.ros.org/rplidar).
 
 Check the authority of rplidar's serial-port:
 
@@ -256,7 +258,9 @@ roslaunch rplidar_ros view_rplidar.launch
 
 #### Test hectormapping or gmaping
 
-Check if you install package of hectormapping 'git clone git@github.com:tu-darmstadt-ros-pkg/hector_slam.git'
+Check if you install package of hectormapping as dependence
+
+- [x] Hectormapping: [Package for SLAM](http://wiki.ros.org/hector_geotiff).
 
 ```
 cd ~/abrobot_ws 
@@ -345,3 +349,10 @@ Now, you can execute the launch file with roscore information
 ```export ROS_IP=10.42.0.98```
 
 ```rosrun rviz rviz```
+
+**If you have problem with master, you can use this command**
+
+```killall -9 roscore```
+
+
+
