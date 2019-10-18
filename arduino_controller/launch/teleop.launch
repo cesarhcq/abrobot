@@ -9,6 +9,6 @@
     </node>
 
     <!-- GuntherTeleop -->
-	<node name="gunther" pkg="abrobot_control" type="gunther_teleop.py" output="screen" launch-prefix="xterm -e"/>
+	<node name="gunther" pkg="arduino_controller" type="gunther_teleop.py" output="screen" launch-prefix="xterm -e"/>
 
 </launch>

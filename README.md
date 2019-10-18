@@ -36,7 +36,7 @@ catkin init
 
 cd ~/abrobot_ws/src/ 
 
-git clone git@github.com:ActaVisio/GuntherBot.git
+git clone git@github.com:cesarhcq/abrobot.git
 
 cd ~/abrobot_ws/
 
@@ -214,7 +214,7 @@ roslaunch arduino_controller test_encoder.launch
 6. Rviz visualization
 
 ```
-rosrun rviz rviz -d ~/guntherBot_ws/src/GuntherBot/arduino_controller/rviz/rviz_test_arduino.rviz
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/abrobot_control/rviz/rviz_test_arduino.rviz
 ```
 
 Close the Arduino IDE and open again. Go to **sketchbook** in the Arduino IDE, and you will see the *ROS_LIB*
