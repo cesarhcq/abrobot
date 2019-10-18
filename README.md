@@ -40,6 +40,8 @@ git clone git@github.com:cesarhcq/abrobot.git
 
 git clone git@github.com:Slamtec/rplidar_ros.git
 
+git clone git@github.com:tu-darmstadt-ros-pkg/hector_slam.git
+
 cd ~/abrobot_ws/
 
 catkin_make
@@ -190,6 +192,10 @@ roscore
 Open another terminal, and run the command:
 
 ```
+cd ~/abrobot_ws/
+
+source devel/setup.bash
+
 rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
 ```
 
@@ -250,17 +256,19 @@ roslaunch rplidar_ros view_rplidar.launch
 
 #### Test hectormapping or gmaping
 
-```
-cd ~/abrobot_ws 
-```
+Check if you install package of hectormapping 'git clone git@github.com:tu-darmstadt-ros-pkg/hector_slam.git'
 
 ```
+cd ~/abrobot_ws 
+
 source devel/setup.bash
 ```
 
 ```
 roslaunch base_controller gmapping.launch
 ```
+
+or
 
 ```
 roslaunch base_controller hectormapping.launch
