@@ -18,4 +18,15 @@
         <param name="use_imu" value="false" />
     </node>
 
+    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+        <param name="video_device" value="/dev/video1" />
+        <param name="image_width" value="640" />
+        <param name="image_height" value="480" />
+        <param name="framerate" value="60" />
+        <param name="pixel_format" value="mjpg" />
+        <param name="camera_frame_id" value="usb_cam" />
+        <param name="io_method" value="mmap"/>
+        <param name="camera_info_url" value="file://$(env HOME)/.ros/camera_info/head_camera.yaml"/>
+    </node>
+
 </launch>
