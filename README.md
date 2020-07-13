@@ -1,4 +1,4 @@
-# GuntherBOT - Autonomous Mobile Robot
+# W-UVC - UVC Autonomous Mobile Robot for disinfection (Covid19)
 
 GuntherBOT is an autonomous mobile robot developed by [Acta Visio](http://www.acta-visio.com) for warehouse indoor environments. GuntherBOT is based on Arlo Robot as mobile platform to perform different tasks in an indoor environments. GuntherBOT was developed with Robot Operating System (ROS) - see more in [ROS Wiki](https://www.ros.org/), Arduino Leonardo and Raspberry Pi 3B.
 
