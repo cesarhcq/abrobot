@@ -1,4 +1,4 @@
-# W-UVC - UVC Autonomous Mobile Robot for disinfection (Covid19)
+# W-UVC - Autonomous Mobile Robot for disinfection (Covid19)
 
 W-UVC is an autonomous mobile robot developed by School of Mechanical Engineering at Pontifical Catholic University of Campinas/SP [PUC Campinas](https://www.puc-campinas.edu.br/) for classroom desinfection. W-UVC is based on Arlo Robot as mobile platform to perform different tasks in an indoor environments. The system is based on Robot Operating System (ROS) - see more in [ROS Wiki](https://www.ros.org/), Arduino Mega and Raspberry Pi 4.
 
