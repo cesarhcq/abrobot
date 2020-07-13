@@ -1,6 +1,6 @@
 # W-UVC - UVC Autonomous Mobile Robot for disinfection (Covid19)
 
-GuntherBOT is an autonomous mobile robot developed by [Acta Visio](http://www.acta-visio.com) for warehouse indoor environments. GuntherBOT is based on Arlo Robot as mobile platform to perform different tasks in an indoor environments. GuntherBOT was developed with Robot Operating System (ROS) - see more in [ROS Wiki](https://www.ros.org/), Arduino Leonardo and Raspberry Pi 3B.
+W-UVC is an autonomous mobile robot developed by School of Mechanical Engineering at Pontifical Catholic University of Campinas/SP [PUC Campinas](https://www.puc-campinas.edu.br/) for classroom desinfection. W-UVC is based on Arlo Robot as mobile platform to perform different tasks in an indoor environments. The system is based on Robot Operating System (ROS) - see more in [ROS Wiki](https://www.ros.org/), Arduino Mega and Raspberry Pi 4.
 
 Version | ROS Distro | Operating System
 ------------ | ------------- | ------------
