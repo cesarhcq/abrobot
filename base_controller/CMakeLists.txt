@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
   sensor_msgs
+  turtlesim
   roscpp
   rospy
   std_msgs
@@ -206,5 +207,10 @@ include_directories(
 add_executable(base_controller src/base_controller.cpp)
 target_link_libraries(base_controller ${catkin_LIBRARIES})
 
+#rosbuild_add_executable(teleop_turtle_joy src/teleop_turtle_joy.cpp)
+
+
+#add_executable(teleop_turtle_joy src/teleop_turtle_joy.cpp)
+#target_link_libraries(teleop_turtle_joy ${catkin_LIBRARIES})
 
 

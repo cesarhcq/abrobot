@@ -59,14 +59,15 @@ int main(int argc, char** argv){
 
   ros::NodeHandle nh;
   ros::NodeHandle nh_private_("~");
-  //ros::Subscriber gyro_sub = nh.subscribe("gyro", 50, handle_gyro);
+  ros::Subscriber gyro_sub = nh.subscribe("gyro", 50, handle_gyro);
   ros::Subscriber sub = nh.subscribe("/vel_encoder", 100, handle_vel_encoder);
-  ros::Subscriber gyro_sub = nh.subscribe("/imu/data", 50, handle_gyro);
+  //ros::Subscriber gyro_sub = nh.subscribe("/imu/data", 50, handle_gyro);
 
   ros::Publisher odom_pub = nh.advertise<nav_msgs::Odometry>("odom", 50);
 
   // Crete tf - base link and Odometry
-  tf::TransformBroadcaster baselink_broadcaster;
+  tf::TransformBroadcaster baselink_laser;
+  tf::TransformBroadcaster baselink_camera;
   tf::TransformBroadcaster odom_broadcaster;
 
   double alpha = 0.0;
@@ -89,11 +90,17 @@ int main(int argc, char** argv){
 
     ros::spinOnce(); //check for incoming messages
 
-    //set tf base_link and laser 
-    baselink_broadcaster.sendTransform(
+    //set tf base_link to laser 
+    baselink_laser.sendTransform(
     tf::StampedTransform(
-      tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.15, 0.0, 0.13)),
+      tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.0, 0.0, 0.13)),
       ros::Time::now(),"base_link", "laser"));
+
+    //set tf base_link to camera 
+    baselink_camera.sendTransform(
+    tf::StampedTransform(
+      tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.2, 0.0, 0.24)),
+      ros::Time::now(),"base_link", "camera"));
 
     if(!init){
 

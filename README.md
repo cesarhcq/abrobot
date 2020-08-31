@@ -1,6 +1,6 @@
-# GuntherBOT - Autonomous Mobile Robot
+# Abrobot - Autonomous Mobile Robot
 
-GuntherBOT is an autonomous mobile robot developed by [Acta Visio](http://www.acta-visio.com) for warehouse indoor environments. GuntherBOT is based on Arlo Robot as mobile platform to perform different tasks in an indoor environments. GuntherBOT was developed with Robot Operating System (ROS) - see more in [ROS Wiki](https://www.ros.org/), Arduino Leonardo and Raspberry Pi 3B.
+Abrobot is an autonomous mobile robot developed by [Acta Visio](http://www.acta-visio.com) for warehouse indoor environments. Abrobot is based on Arlo Robot as mobile platform to perform different tasks in an indoor environments. GuntherBOT was developed with Robot Operating System (ROS) - see more in [ROS Wiki](https://www.ros.org/), Arduino Leonardo and Raspberry Pi 3B.
 
 Version | ROS Distro | Operating System
 ------------ | ------------- | ------------
@@ -30,15 +30,19 @@ Version | ROS Distro | Operating System
 1. Create a simple ROS Workspace - if you don't have yet. Following the installation instructions.
 
 ```
-mkdir -p ~/guntherBot_ws/src && cd ~/guntherBot_ws
+mkdir -p ~/abrobot_ws/src && cd ~/abrobot_ws
 
 catkin init
 
-cd ~/guntherBot_ws/src/ 
+cd ~/abrobot_ws/src/ 
 
-git clone -b cesar-working https://github.com/cesarhcq/abrobot.git
+git clone git@github.com:cesarhcq/abrobot.git
 
-cd ~/guntherBot_ws/
+git clone git@github.com:Slamtec/rplidar_ros.git
+
+git clone git@github.com:tu-darmstadt-ros-pkg/hector_slam.git
+
+cd ~/abrobot_ws/
 
 catkin_make
 
@@ -47,14 +51,14 @@ catkin_make
 2. Start a simple simulation of the GuntherBOT mobile Robot.
 
 ```
-cd ~/guntherBot_ws/
+cd ~/abrobot_ws/
 
 source devel/setup.bash
 
 roslaunch abrobot_gazebo second.launch
 ```
 
-![guntherBOT](https://user-images.githubusercontent.com/15223825/57947842-64adbf00-78b6-11e9-944c-1244ae82ffaa.jpg)
+![guntherBOT](/images/guntherBOT.jpg)
 
 3. Add more objects for Mapping
 
@@ -97,7 +101,36 @@ If you intend to add more objects in the world, you'll need to save as new world
 </launch>
 ```
 
-4. TODO
+4. Implement ROS driver for several 9-DOF IMUs
+
+```
+mkdir -p ~/catkin_ws/src && cd ~/catkin_ws
+
+catkin init
+
+cd ~/catkin_ws/src/ 
+
+git clone git@github.com:cesarhcq/i2c_imu.git
+
+cd ~/catkin_ws/
+
+catkin_make
+```
+
+Publishes [sensor_msgs::IMU](http://docs.ros.org/api/sensor_msgs/html/msg/Imu.html) messages at 10Hz to `/imu/data` topic. 
+Specifically populates `angular_velocity` & `linear_acceleration`
+
+```
+<!-- Gyro from MPU9250 -->
+<include file="$(find i2c_imu)/launch/i2c_imu_auto.launch"/>
+```
+
+### MPU9250 - electric schematic
+
+![MPU9250 - electric schematic](/images/mpu-eletric.png)
+
+
+5. TODO
 
 ## Real GuntherBOT - Integration Raspberry Pi 3, Arduino and ROS
 
@@ -110,7 +143,7 @@ After simulation, you need to do the experiments in real world. It is very impor
 - [x] Rosserial: [Package for Arduino - Real Robot](http://wiki.ros.org/rosserial).
 
 
-1. Plug the Arduino USB cable in the Raspberry Pi 3. Now, open the Arduino IDE to verify what's the USB port connected. If you are not installed Arduino IDE in the Raspberry Pi 3, you can follow this instructions.
+Plug the Arduino USB cable in the Raspberry Pi 3. Now, open the Arduino IDE to verify what's the USB port connected. If you are not installed Arduino IDE in the Raspberry Pi 3, you can follow this instructions.
 
 ```
 sudo apt-get update
@@ -131,59 +164,38 @@ After IDE Arduino installed, you'll need to install the **ros_lib library**
 
 The link between ROS and Arduino is through the ros_lib library. This library will be used as any other Arduino library. To install the ros_lib library, type the following commands in the Ubuntu terminal:
 
+
+#### Test Arduino
+
+1. Open Arduino in terminal
+
+```
+arduino
+```
+
+2. Test libraries of Arduino
+
 ```
 cd <sketchbook>/libraries
 ```
+
 ```
 rosrun rosserial_arduino make_libraries.py .
 ```
 
-Close the Arduino IDE and open again. Go to **sketchbook** in the Arduino IDE, and you will see the *ROS_LIB*
-
-Verify the *serial_port* connected. In our case is:
-
-> /dev/ttyACM0
-
-
-### How to run rplidar ros package
-
-Check the authority of rplidar's serial-port:
-```
-ls -l /dev |grep ttyUSB
-```
-Add the authority of write: (such as /dev/ttyUSB0)
-```
-sudo chmod 666 /dev/ttyUSB0
-```
-There're two ways to run rplidar ros package
-
-### Simultaneous Localization and Mapping (SLAM) - ROS Navigation Stack - Real Application
-
-#### Mapping
-
-1. Navigate around the environment using Teleop Keyboard.
-
-2. Saving the Map
+3. Test node of Arduino in ROS manually
 
 ```
-rosrun map_server map_saver -f ~/guntherbot/src/abrobot/abrobot_navigation/maps/test_map
+roscore
 ```
 
-3. Loading the map
+Open another terminal, and run the command:
 
 ```
-roslaunch abrobot_navigation amcl_demo.launch
-```
+cd ~/abrobot_ws/
 
-4. Rviz visualization
+source devel/setup.bash
 
-```
-roslaunch mybot_description mybot_rviz_amcl.launch
-```
-
-5. Run tests on Arduino
-
-```
 rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=57600
 ```
 
@@ -195,13 +207,64 @@ rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 rosrun base_controller base_controller
 ```
 
-6. Run gmaping and run tests AMCL
+4. Run robot teleoperation automatically
 
 ```
-cd ~/ABRobot 
+roslaunch arduino_controller teleop.launch
+```
+
+5. Test robot with Arduino and Encoder automatically
+
+```
+roslaunch arduino_controller test_encoder.launch
+```
+
+6. Rviz visualization
+
+```
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/arduino_controller/rviz/rviz_test_arduino.rviz
+```
+
+Close the Arduino IDE and open again. Go to **sketchbook** in the Arduino IDE, and you will see the *ROS_LIB*
+
+Verify the *serial_port* connected. In our case is:
+
+> /dev/ttyACM0
+
+
+### How to run rplidar ros package
+
+Check if you install package rplidar in
+
+- [x] Rplidar ROS: [Package for Laser](http://wiki.ros.org/rplidar).
+
+Check the authority of rplidar's serial-port:
+
+```
+ls -l /dev |grep ttyUSB
+```
+
+Add the authority of write: (such as /dev/ttyUSB0)
+
+```
+sudo chmod 666 /dev/ttyUSB0
 ```
 
 ```
+roslaunch rplidar_ros view_rplidar.launch
+```
+
+### Simultaneous Localization and Mapping (SLAM) - ROS Navigation Stack - Real Application
+
+#### Test hectormapping or gmaping
+
+Check if you install package of hectormapping as dependence
+
+- [x] Hectormapping: [Package for SLAM](http://wiki.ros.org/hector_geotiff).
+
+```
+cd ~/abrobot_ws 
+
 source devel/setup.bash
 ```
 
@@ -209,10 +272,49 @@ source devel/setup.bash
 roslaunch base_controller gmapping.launch
 ```
 
+or
+
 ```
-roslaunch abrobot_navigation amcl_demo.launch
+roslaunch base_controller hectormapping.launch
 ```
 
+Rviz visualization
+
+```
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/base_controller/rviz/rviz_encoder_gyro.rviz
+```
+
+#### Mapping
+
+1. Navigate around the environment using Teleop Keyboard.
+
+```
+roslaunch arduino_controller teleop.launch
+```
+
+2. Saving the Map
+
+```
+rosrun map_server map_saver -f ~/abrobot_ws/src/abrobot/abrobot_navigation/maps/test_map.yaml
+```
+
+3. Loading the map
+
+```
+roslaunch autonomous_navigation amcl_navigation.launch
+```
+
+4. Rviz visualization
+
+```
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/abrobot_navigation/rviz/robot_amcl_navigation.rviz
+```
+
+or
+
+```
+rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/abrobot_navigation/rviz/amcl_real_navigation.rviz
+```
 
 ### WiFi connection between Robot and PC
 
@@ -247,5 +349,10 @@ Now, you can execute the launch file with roscore information
 ```export ROS_IP=10.42.0.98```
 
 ```rosrun rviz rviz```
+
+**If you have problem with master, you can use this command**
+
+```killall -9 roscore```
+
 
 

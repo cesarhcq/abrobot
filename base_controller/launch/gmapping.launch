@@ -1,10 +1,8 @@
 <!--
   notice : you should install gmapping-slam at first, command 'sudo apt-get install ros-indigo-gmapping'and 'sudo apt-get install ros-indigo-slam-gmapping'.
            this launch just for test, you should improve the param for the best result.
-
   you nedd change the frame of the "static_transform_publisher" when using the real robot platform.
   it is better  subscribe the topic /odom with true to slam in gmapping
-
 E-mail: kint.zhao@slamtec.com
  -->
 <launch>
@@ -12,8 +10,8 @@ E-mail: kint.zhao@slamtec.com
     <!-- RPLidar A1 LaserScan-->
     <include file="$(find rplidar_ros)/launch/rplidar.launch" />
 
-	<!-- Gyro from MPU9250 -->
-	<include file="$(find i2c_imu)/launch/i2c_imu_auto.launch" />
+  <!-- Gyro from MPU9250 -->
+  <!-- <include file="$(find i2c_imu)/launch/i2c_imu_auto.launch" /> -->
 
     <!--Arduino Low-Controller-->
     <node pkg="rosserial_python" type="serial_node.py" name="arduino_controller" output= "screen">
@@ -34,7 +32,7 @@ E-mail: kint.zhao@slamtec.com
         <param name="use_imu" value="true" />
     </node>
 
-    <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+<!--     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
         <param name="video_device" value="/dev/video0" />
         <param name="image_width" value="640" />
         <param name="image_height" value="480" />
@@ -42,7 +40,7 @@ E-mail: kint.zhao@slamtec.com
         <param name="camera_frame_id" value="usb_cam" />
         <param name="io_method" value="mmap"/>
         <param name="camera_info_url" value="file://$(env HOME)/.ros/camera_info/head_camera.yaml"/>
-    </node>
+    </node> -->
 
     <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find base_controller)/rviz/rviz_laser_encoder.rviz" />-->
 
