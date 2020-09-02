@@ -316,6 +316,84 @@ or
 rosrun rviz rviz -d ~/abrobot_ws/src/abrobot/abrobot_navigation/rviz/amcl_real_navigation.rviz
 ```
 
+### How to run Joystick Ps3 Controller
+
+## Install the following dependencies:
+
+- [x] libbluetooth-dev package
+- [x] cwiid package
+
+```
+sudo apt-get install libbluetooth-dev
+```
+
+```
+sudo apt-get install libcwiid-dev
+```
+
+```
+sudo apt-get install ros-kinetic-joy ros-kinetic-joy-teleop
+```
+
+1. Start by installing the dependencies and compiling the driver and packages `teleop_twist_joy` and `joystick-drivers`. For more information, see the details in the [ROS-Wiki-joy-Tutorials](http://wiki.ros.org/joy/Tutorials/ConfiguringALinuxJoystick) and [ROS-Wiki-Joystick-Bluetooth](http://wiki.ros.org/ps3joy/Tutorials/PairingJoystickAndBluetoothDongle)
+
+
+
+```
+sudo apt-get install ros-kinetic-teleop-twist-joy ros-kinetic-joystick-drivers
+
+rosdep install ps3joy
+
+rosmake ps3joy
+```
+
+2. Connecting to the Joystick Via Bluetooth
+
+Unplug the joystick from the computer and make sure that the USB bluetooth dongle is plugged in. Now, start the program to create the connection between the bluetooth dongle and the joystick:
+
+```
+sudo bash
+
+rosrun ps3joy ps3joy.py
+```
+
+You will see: `Waiting for connection. Disconnect your PS3 joystick from USB and press the pairing button.`
+
+
+3. Press the PS button in the middle of the joystick and the connection will be activated.
+
+You will see: `Connection is Activated.`
+
+
+4. Confirming Joystick Input
+
+In a new terminal, confirm that the joystick is sending data to your computer. You can test this with jstest:
+
+```
+sudo jstest /dev/input/jsX
+```
+
+5. Now let's make the joystick accessible for the ROS joy node. Start by listing the permissions of the joystick:
+
+```
+ls -l /dev/input/jsX
+```
+You will see something similar to:'crw-rw-XX- 1 root dialout 188, 0 2020-08-14 12:04 /dev/input/jsX'
+
+If XX is rw: the js device is configured properly.
+
+If XX is --: the js device is not configured properly and you need to:
+
+```
+sudo chmod a+rw /dev/input/jsX
+```
+
+6. Run the 'teleop_ps3.launch'
+
+```
+roslaunch base_controller teleop_ps3.launch
+```
+
 ### WiFi connection between Robot and PC
 
 The Abrobot has a WiFi access point ```ssid: ubiquityrobot```. 
