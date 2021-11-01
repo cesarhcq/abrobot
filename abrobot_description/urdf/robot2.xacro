@@ -4,7 +4,6 @@
 
   <xacro:include filename="$(find abrobot_description)/urdf/robot2.gazebo" />
   <xacro:include filename="$(find abrobot_description)/urdf/materials.xacro" />
-  <!-- <xacro:include filename="$(find abrobot_description)/urdf/macros.xacro"/> -->
 
 
   <!-- Base Robotic -->

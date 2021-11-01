@@ -84,6 +84,6 @@ E-mail: kint.zhao@slamtec.com
 
   </node>
 
-  <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
-
+<!--   <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
+ -->
 </launch>

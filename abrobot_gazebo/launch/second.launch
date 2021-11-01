@@ -2,9 +2,9 @@
 <launch>
   <!-- Initial parameters for position in gazebo world -->
 
-  <arg name ="x" default="0"/>
+<!--   <arg name ="x" default="0"/>
   <arg name ="y" default="0"/>
-  <arg name ="z" default="10.5"/>
+  <arg name ="z" default="10.5"/> -->
 
   <arg name="world" default="empty"/> 
   <arg name="paused" default="false"/>
@@ -27,8 +27,9 @@
   <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find abrobot_description)/urdf/robot2.xacro'"/>
 
   <node name="abrobot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
-   args="-urdf -param robot_description -model abrobot -x $(arg x) -y $(arg y) -z $(arg z)" />
+   args="-urdf -param robot_description -model abrobot" />
 
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
+
+<!--   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/> -->
 
 </launch>

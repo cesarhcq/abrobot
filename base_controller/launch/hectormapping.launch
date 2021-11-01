@@ -12,16 +12,16 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
 <launch>
 
     <!--Laser rplidar-->
-    <include file="$(find rplidar_ros)/launch/rplidar.launch" />
+<!--     <include file="$(find rplidar_ros)/launch/rplidar.launch" /> -->
 	
 	<!-- Gyro from MPU9250 -->
 	<!-- <include file="$(find i2c_imu)/launch/i2c_imu_auto.launch" /> -->
 
     <!--Arduino Low-Controller -->
-    <node pkg="rosserial_python" type="serial_node.py" name="arduino_controller" output= "screen">
+<!--     <node pkg="rosserial_python" type="serial_node.py" name="arduino_controller" output= "screen">
         <param name="port" value="/dev/ttyACM0"/>  
         <param name="baud" value="57600"/>
-    </node>
+    </node> -->
 
     <!--Gyro from smartphone-->
     <!-- <node name="imu_node" pkg="abrobot_control" type="gyro.py" output="screen"> -->
@@ -31,10 +31,10 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
     <!--    </node> -->
 
     <!--Odometry Controller-->
-    <node name="base_controller_node" pkg="base_controller" type="base_controller">
+<!--     <node name="base_controller_node" pkg="base_controller" type="base_controller">
         <param name="alpha" value="0.0" />
         <param name="use_imu" value="true" />
-    </node>
+    </node> -->
 
     <!--Camera USB-->
     <!-- <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
@@ -86,8 +86,8 @@ See the "map_update_distance_thresh" it means that the close obstacles can be ig
         <arg name="map_file_path" value="$(arg geotiff_map_file_path)"/>
     </include>
 
-    <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
-
+<!--     <node name="teleop" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" launch-prefix="xterm -e"/>
+ -->
     <!-- Teleop -->
     <!--<node name="GuntherTeleop" pkg="arduino_controller" type="gunther_teleop.py" output="screen" launch-prefix="xterm -e"/> -->
 
