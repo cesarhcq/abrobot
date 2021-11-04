@@ -14,7 +14,7 @@
   <arg name="debug" default="false"/>
   
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" value="$(find abrobot_gazebo)/worlds/test4.world"/>
+    <arg name="world_name" value="$(find abrobot_gazebo)/worlds/real.world"/>
 <!--     <arg name="world_name" value="$(find abrobot_gazebo)/worlds/turtlebot_playground.world"/> -->
     <arg name="paused" value="$(arg paused)"/>
     <arg name="use_sim_time" value="$(arg use_sim_time)"/>
