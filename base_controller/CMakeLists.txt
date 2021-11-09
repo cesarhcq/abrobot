@@ -207,6 +207,10 @@ include_directories(
 add_executable(base_controller src/base_controller.cpp)
 target_link_libraries(base_controller ${catkin_LIBRARIES})
 
+add_executable(go_to_point_node src/go_to_point.cpp)
+target_link_libraries(go_to_point_node ${catkin_LIBRARIES})
+
+
 #rosbuild_add_executable(teleop_turtle_joy src/teleop_turtle_joy.cpp)
 
 
